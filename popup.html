@@ -1,46 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
     <title>Popup</title>
+    <script async src="popup.js"></script>
+    <link rel="stylesheet" href="popup.css" />
   </head>
-  <body>
-    <div>
-      <label for="npmfield">NPM:</label>
-      <div style="height: 10px"></div>
-      <input
-        type="text"
-        id="npmfield"
-        name="NPM"
-        autofocus
-        autocomplete="off"
-      />
-    </div>
-    <div style="height: 10px"></div>
-    <div>
-      <label for="moduldropdown">Modul:</label>
 
-      <select name="moduldropdown" id="modul">
-        <option value="">Pilih modul</option>
-        <option value="modul1">Modul 1</option>
-        <option value="modul2">Modul 2</option>
-        <option value="modul3">Modul 3</option>
-        <option value="modul4">Modul 4</option>
-        <option value="modul5">Modul 5</option>
-        <option value="modul6">Modul 6</option>
-        <option value="modul7">Modul 7</option>
-        <option value="modul8">Modul 8</option>
-        <option value="modul9">Modul 9</option>
-        <option value="modul10">Modul 10</option>
-      </select>
+  <body>
+    <div style="padding: 0.2rem">
+      <div>
+        <label for="npmfield">NPM:</label>
+        <input
+          type="text"
+          id="npmfield"
+          name="NPM"
+          autofocus
+          autocomplete="off"
+        />
+      </div>
+      <div>
+        <label for="moduldropdown">Modul:</label>
+        <select name="moduldropdown" id="modul">
+          <option value="">Pilih modul</option>
+          <option value="modul1">Modul 1</option>
+          <option value="modul2">Modul 2</option>
+          <option value="modul3">Modul 3</option>
+          <option value="modul4">Modul 4</option>
+          <option value="modul5">Modul 5</option>
+          <option value="modul6">Modul 6</option>
+          <option value="modul7">Modul 7</option>
+          <option value="modul8">Modul 8</option>
+          <option value="modul9">Modul 9</option>
+          <option value="modul10">Modul 10</option>
+        </select>
+      </div>
+      <div id="button" style="text-align: right">
+        <button id="search">Search</button>
+      </div>
+      <div id="result"></div>
     </div>
-    <div style="height: 10px"></div>
-    <div id="button" style="text-align: right">
-      <button id="search">Search</button>
-    </div>
-    <div style="height: 10px"></div>
-    <div id="result"></div>
   </body>
-  <script src="popup.js" charset="utf-8"></script>
-  <div class="loader"></div>
 </html>
