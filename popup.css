@@ -1,3 +1,35 @@
 * {
-    margin: 0.25rem 0.1rem;
+  margin: 0.25rem 0.1rem;
+}
+
+h2 {
+  text-align: center;
+}
+
+body {
+  padding: 0.3rem;
+}
+
+#result {
+  overflow-y: auto;
+  max-height: 12rem;
+}
+
+.loading {
+  border: 0.4rem solid #f3f3f3; /* Light grey */
+  border-top: 0.4rem solid #00000f; /* Blue */
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  animation: spin 2s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

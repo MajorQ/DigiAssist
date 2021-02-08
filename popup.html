@@ -2,26 +2,34 @@
 <html lang="en">
   <head>
     <title>Popup</title>
-    <script async src="popup.js"></script>
+    <script src="src/popup.js" defer></script>
     <link rel="stylesheet" href="popup.css" />
   </head>
 
   <body>
-    <div style="padding: 0.2rem">
+    <div class="loading" id="popup_loading" style="display: none"></div>
+    <div id="popup_body">
+      <div><h2>DigiAssist</h2></div>
       <div>
-        <label for="npmfield">NPM:</label>
+        <label for="npm_text_field">Cari NPM:</label>
         <input
           type="text"
-          id="npmfield"
+          id="npm_text_field"
           name="NPM"
           autofocus
           autocomplete="off"
         />
       </div>
       <div>
-        <label for="moduldropdown">Modul:</label>
-        <select name="moduldropdown" id="modul">
-          <option value="">Pilih modul</option>
+        <label for="praktikum_dropdown">Pilih Praktikum:</label>
+        <select name="praktikum_dropdown" id="praktikum_dropdown">
+          <option value="">Semua praktikum</option>
+        </select>
+      </div>
+      <div>
+        <label for="modul_dropdown">Pilih Modul:</label>
+        <select name="modul_dropdown" id="modul_dropdown">
+          <option value="">--</option>
           <option value="modul1">Modul 1</option>
           <option value="modul2">Modul 2</option>
           <option value="modul3">Modul 3</option>
@@ -34,10 +42,16 @@
           <option value="modul10">Modul 10</option>
         </select>
       </div>
-      <div id="button" style="text-align: right">
-        <button id="search">Search</button>
+      <div style="text-align: right">
+        <button id="search_button">Search</button>
       </div>
-      <div id="result"></div>
+      <div id="result">
+        <div class="loading" id="result_loading" style="display: none"></div>
+      </div>
+      <div style="display: inline">
+        <p id="date"></p>
+        <button id="refresh_button">Refresh</button>
+      </div>
     </div>
   </body>
 </html>
