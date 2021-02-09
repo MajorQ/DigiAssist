@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "watch": true,
+        "lib": ["ES2015", "DOM"],
+        "typeRoots": ["node_modules/@types", "node_modules/web-ext-types"],
+    }
+}
