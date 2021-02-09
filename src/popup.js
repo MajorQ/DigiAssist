@@ -48,42 +48,41 @@ const refresh_button = document.getElementById("refresh_button");
 let praktikumList = [];
 main();
 
-async function main(fetchOverride = false) {
+async function main() {
 
   toggleLoading(popup_body, popup_loading);
 
   // get the data
-  let fetchNewData = false;
-  if (!fetchOverride) {
-    try {
-      await chrome.storage.local.get(["cache", "cacheTime"], (data) => {
-        if (Date.now() - data.cacheTime > 3600 * 1000) {
-          fetchNewData = true;
-        } else {
-          date.innerHTML = `Last Update: ${Date(data.cacheTime)}`;
-          praktikumList = data.cache;
+  try {
+    chrome.storage.local.get(["cache", "cacheTime"], async (data) => {
+      if (Date.now() - data.cacheTime > 3600 * 1000) {
+
+        praktikumList = await fetchAllSheets();
+        chrome.storage.local.set({
+          cache: praktikumList,
+          cacheTime: Date.now(),
+        }, () => {
+          date.innerHTML = `Last Update: ${Date(Date.now())}`;
           createPraktikumDropdown(praktikumList);
           toggleLoading(popup_body, popup_loading);
-        }
-      });
-    } catch (error) {
-      fetchNewData = true;
-      console.error(error.message);
-    }
-  }
-
-  if (fetchNewData || fetchOverride) {
+        });
+      } else {
+        date.innerHTML = `Last Update: ${Date(data.cacheTime)}`;
+        praktikumList = data.cache;
+        createPraktikumDropdown(praktikumList);
+        toggleLoading(popup_body, popup_loading);
+      }
+    });
+  } catch (error) {
     praktikumList = await fetchAllSheets();
     chrome.storage.local.set({
       cache: praktikumList,
       cacheTime: Date.now(),
     }, () => {
-      if (!fetchOverride) {
-        createPraktikumDropdown(praktikumList);
-      }
+      date.innerHTML = `Last Update: ${Date(Date.now())}`;
+      createPraktikumDropdown(praktikumList);
       toggleLoading(popup_body, popup_loading);
     });
-    date.innerHTML = `Last Update: ${Date(Date.now())}`;
   }
 }
 
@@ -125,9 +124,18 @@ search_button.onclick = async (_) => {
   }
 };
 
-refresh_button.onclick = (_) => {
-  // run main again, force fetch data
-  main(true);
+refresh_button.onclick = async (_) => {
+  toggleLoading(popup_body, popup_loading);
+
+  praktikumList = await fetchAllSheets();
+  chrome.storage.local.set({
+    cache: praktikumList,
+    cacheTime: Date.now(),
+  }, () => {
+    date.innerHTML = `Last Update: ${Date(Date.now())}`;
+    createPraktikumDropdown(praktikumList);
+    toggleLoading(popup_body, popup_loading);
+  });
 };
 
 // =============================================================================
@@ -203,6 +211,8 @@ function getColumn(content, header) {
 // =============================================================================
 
 function createPraktikumDropdown(list) {
+
+  if (list == undefined) return;
 
   // sort list of praktikum then
   list.sort((a, b) => {
