@@ -1,6 +1,7 @@
 const path = require('path')
 
 module.exports = {
+    watch: true,
     entry: './src/popup.ts',
     devtool: 'source-map',
     module: {
@@ -18,6 +19,6 @@ module.exports = {
     },
     output: {
       filename: 'main.js',
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname, 'dist/js/'),
     },
 };
