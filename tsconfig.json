@@ -1,8 +1,9 @@
 {
     "compilerOptions": {
-        "target": "ES2015",
+        "target": "ES6",
         "watch": true,
-        "lib": ["ES2015", "DOM"],
-        "typeRoots": ["node_modules/@types", "node_modules/web-ext-types"],
+        "lib": ["ES2017", "DOM"],
+        "outDir": "./src/js",
+        "moduleResolution": "Node",
     }
 }
