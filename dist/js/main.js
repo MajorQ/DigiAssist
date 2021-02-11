@@ -17187,23 +17187,20 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 };
 
 function fetchSheet(sheet_id, sheet_index) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const url = `https://spreadsheets.google.com/feeds/list/${sheet_id}/${sheet_index}/public//values?alt=json`;
-        const response = yield fetch(url);
-        // return [{}];
-        console.log(response);
-        // if (!response.ok) {
-        //     return new ServerError(
-        //         response.status,
-        //         response.statusText,
-        //     );
-        // }
-        const result = yield response.json();
-        console.log(result);
-        return [{}];
-        // // remove the sheet headers and only return the values inside the sheet
-        // // if there are no values return empty Array
-        // return result['feed']['entry'] ?? [];
+        const url = `https://spreadsheets.google.com/feeds/list/${sheet_id}/${sheet_index}/public/values?alt=json`;
+        const response = yield fetch(url).catch(() => { return Response.error(); });
+        if (!response.ok) {
+            throw Error(`(error code ${response.status})`);
+        }
+        const result = yield response.json().catch(() => { return null; });
+        if (result == null) {
+            throw Error('(parsing error)');
+        }
+        // remove the sheet headers and only return the values inside the sheet
+        // if there are no values return empty Array
+        return (_a = result['feed']['entry']) !== null && _a !== void 0 ? _a : [];
     });
 }
 
@@ -17239,9 +17236,8 @@ const refresh_button = document.getElementById('refresh_button');
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     var a = yield webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__.browser.storage.local.get('unknown');
     if (lodash__WEBPACK_IMPORTED_MODULE_1__.isEmpty(a)) {
-        // const data = await func.fetchSheet('1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg-', 1);
-        const data = yield _functions__WEBPACK_IMPORTED_MODULE_2__.fetchSheet('1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ', 3);
-        // console.log(data);
+        const data = yield _functions__WEBPACK_IMPORTED_MODULE_2__.fetchSheet('1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg', 1).catch((err) => { return `Could not access Master Sheet ${err.message}`; });
+        console.log(data);
     }
 }));
 search_button.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {

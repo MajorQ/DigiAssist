@@ -1,30 +1,34 @@
-import { ServerError } from "./classes/error"
-export { fetchSheet }
+import { isNull, has } from 'lodash';
+import { FetchError, ResponseBodyShapeError, ResponseParseError } from './classes/errors';
 
-async function fetchSheet(sheet_id : string, sheet_index : number): Promise<ServerError | Object[]> {
-    const url = `https://spreadsheets.google.com/feeds/list/${sheet_id}/${sheet_index}/public//values?alt=json`;
+export async function fetchSheet(
+	sheet_id: string,
+	sheet_index: number
+): Promise<Object[]> {
+	const url = `https://spreadsheets.google.com/feeds/list/${sheet_id}/${sheet_index}/public/values?alt=json`;
 
-    const response = await fetch(url);
+	const response = await fetch(url).catch(() => {
+		return Response.error();
+	});
 
-    // return [{}];
+	if (!response.ok) {
+		throw new FetchError(response.status);
+	}
 
-    console.log(response);
+	const result = await response.json().catch(() => {
+		return null;
+	});
 
-    // if (!response.ok) {
-    //     return new ServerError(
-    //         response.status,
-    //         response.statusText,
-    //     );
-        
-    // }
 
-    const result = await response.json();
+	if (isNull(result)) {
+		throw ResponseParseError;
+	}
 
-    console.log(result);
-    
-    return [{}];
-    
-    // // remove the sheet headers and only return the values inside the sheet
-    // // if there are no values return empty Array
-    // return result['feed']['entry'] ?? [];
+	// first, check if response is has the proper headers
+	if (!has(result, 'feed') || !has(result['feed'], 'entry')) {
+		throw ResponseBodyShapeError;
+	}
+
+	// then, remove the sheet headers and only return the values inside the sheet
+	return result['feed']['entry'];
 }
