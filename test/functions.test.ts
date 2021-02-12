@@ -25,38 +25,39 @@ describe('fetchSheet', () => {
 		expect(global.fetch).toHaveBeenCalledWith(test_url);
 	});
 
-	it('should return array of objects if fetch is successful', async () => {
+	it('should return array of objects if fetch is successful', () => {
 		global.fetch.mockResponseOnce(JSON.stringify(mock_responses.success));
 		expect(fetchSheet(test_sheet_id, test_sheet_index)).resolves.toEqual(
 			test_response
 		);
 	});
 
-	it('should throw an error if sheet is empty', async () => {
-		global.fetch.mockResponseOnce(JSON.stringify(mock_responses.empty));
-		expect(fetchSheet(test_sheet_id, test_sheet_index)).resolves.toThrow(
-			ResponseBodyShapeError
-		);
-	});
-
-	it('should throw an error if fetch has been rejected', async () => {
+	it('should throw a FetchError if fetch has been rejected', () => {
 		global.fetch.mockRejectOnce();
 		expect(fetchSheet(test_sheet_id, test_sheet_index)).resolves.toThrow(
 			FetchError
 		);
 	});
 
-	it('should throw an error if fetch has been aborted', async () => {
+	it('should throw a FetchError if fetch has been aborted', () => {
 		global.fetch.mockAbortOnce();
 		expect(fetchSheet(test_sheet_id, test_sheet_index)).resolves.toThrow(
 			FetchError
 		);
 	});
 
-	it("should throw an error if fetch can't be parsed", async () => {
+	it("should throw a ResponseParseError if fetch can't be parsed", () => {
 		global.fetch.mockResponseOnce('this is not json');
 		expect(fetchSheet(test_sheet_id, test_sheet_index)).resolves.toThrow(
 			ResponseParseError
 		);
 	});
+    
+	it('should throw a ResponseBodyShapeError if sheet is empty', () => {
+		global.fetch.mockResponseOnce(JSON.stringify(mock_responses.empty));
+		expect(fetchSheet(test_sheet_id, test_sheet_index)).resolves.toThrow(
+			ResponseBodyShapeError
+		);
+	});
+
 });

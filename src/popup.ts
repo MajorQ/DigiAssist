@@ -9,19 +9,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 	var a = await browser.storage.local.get('unknown');
 
 	if (isEmpty(a)) {
-		const data = await func
-			.fetchSheet('1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg', 1)
-			.catch((err: Error) => {
-				return `Could not access Master Sheet ${err.message}`;
-			});
-
-		console.log(data);
-		
+		func.refresh();
 	}
 });
 
-search_button.addEventListener('click', async () => {
-	console.log('click lmao');
-});
+search_button.addEventListener('click', async () => {});
 
 refresh_button.addEventListener('click', async () => {});
