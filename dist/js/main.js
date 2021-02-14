@@ -17165,6 +17165,163 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 /***/ }),
 
+/***/ "./node_modules/ts-custom-error/dist/custom-error.mjs":
+/*!************************************************************!*\
+  !*** ./node_modules/ts-custom-error/dist/custom-error.mjs ***!
+  \************************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "CustomError": () => (/* binding */ CustomError),
+/* harmony export */   "customErrorFactory": () => (/* binding */ customErrorFactory)
+/* harmony export */ });
+function fixProto(target, prototype) {
+  var setPrototypeOf = Object.setPrototypeOf;
+  setPrototypeOf ? setPrototypeOf(target, prototype) : target.__proto__ = prototype;
+}
+function fixStack(target, fn) {
+  if (fn === void 0) {
+    fn = target.constructor;
+  }
+
+  var captureStackTrace = Error.captureStackTrace;
+  captureStackTrace && captureStackTrace(target, fn);
+}
+
+var __extends = undefined && undefined.__extends || function () {
+  var extendStatics = function (d, b) {
+    extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) { if (b.hasOwnProperty(p)) { d[p] = b[p]; } }
+    };
+
+    return extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var CustomError = function (_super) {
+  __extends(CustomError, _super);
+
+  function CustomError(message) {
+    var _newTarget = this.constructor;
+
+    var _this = _super.call(this, message) || this;
+
+    Object.defineProperty(_this, 'name', {
+      value: _newTarget.name,
+      enumerable: false,
+      configurable: true
+    });
+    fixProto(_this, _newTarget.prototype);
+    fixStack(_this);
+    return _this;
+  }
+
+  return CustomError;
+}(Error);
+
+var __spreadArrays = undefined && undefined.__spreadArrays || function () {
+  var arguments$1 = arguments;
+
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) { s += arguments$1[i].length; }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) { for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) { r[k] = a[j]; } }
+
+  return r;
+};
+function customErrorFactory(fn, parent) {
+  if (parent === void 0) {
+    parent = Error;
+  }
+
+  function CustomError() {
+    var arguments$1 = arguments;
+
+    var args = [];
+
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments$1[_i];
+    }
+
+    if (!(this instanceof CustomError)) { return new (CustomError.bind.apply(CustomError, __spreadArrays([void 0], args)))(); }
+    parent.apply(this, args);
+    Object.defineProperty(this, 'name', {
+      value: fn.name || parent.name,
+      enumerable: false,
+      configurable: true
+    });
+    fn.apply(this, args);
+    fixStack(this, CustomError);
+  }
+
+  return Object.defineProperties(CustomError, {
+    prototype: {
+      value: Object.create(parent.prototype, {
+        constructor: {
+          value: CustomError,
+          writable: true,
+          configurable: true
+        }
+      })
+    }
+  });
+}
+
+
+//# sourceMappingURL=custom-error.mjs.map
+
+
+/***/ }),
+
+/***/ "./src/classes/errors.ts":
+/*!*******************************!*\
+  !*** ./src/classes/errors.ts ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "FetchError": () => (/* binding */ FetchError),
+/* harmony export */   "ResponseParseError": () => (/* binding */ ResponseParseError),
+/* harmony export */   "ResponseBodyShapeError": () => (/* binding */ ResponseBodyShapeError)
+/* harmony export */ });
+/* harmony import */ var ts_custom_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ts-custom-error */ "./node_modules/ts-custom-error/dist/custom-error.mjs");
+
+class FetchError extends ts_custom_error__WEBPACK_IMPORTED_MODULE_0__.CustomError {
+    constructor(status) {
+        super(`(fetch error with code ${status})`);
+    }
+}
+class ResponseParseError extends ts_custom_error__WEBPACK_IMPORTED_MODULE_0__.CustomError {
+    constructor() {
+        super('(parse error)');
+    }
+}
+class ResponseBodyShapeError extends ts_custom_error__WEBPACK_IMPORTED_MODULE_0__.CustomError {
+    constructor() {
+        super('(object shape error)');
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/functions.ts":
 /*!**************************!*\
   !*** ./src/functions.ts ***!
@@ -17174,8 +17331,12 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "fetchSheet": () => (/* binding */ fetchSheet)
+/* harmony export */   "fetchSheet": () => (/* binding */ fetchSheet),
+/* harmony export */   "fetchAllSheets": () => (/* binding */ fetchAllSheets)
 /* harmony export */ });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _classes_errors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./classes/errors */ "./src/classes/errors.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17186,21 +17347,37 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     });
 };
 
+
 function fetchSheet(sheet_id, sheet_index) {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const url = `https://spreadsheets.google.com/feeds/list/${sheet_id}/${sheet_index}/public/values?alt=json`;
-        const response = yield fetch(url).catch(() => { return Response.error(); });
-        if (!response.ok) {
-            throw Error(`(error code ${response.status})`);
+        const response = yield fetch(url)
+            .then((response) => {
+            if (!response.ok || response.status !== 200) {
+                throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.FetchError(response.status);
+            }
+            return response;
+        })
+            .catch(() => {
+            throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.FetchError(0);
+        });
+        const result = yield response.json().catch(() => {
+            throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.ResponseParseError();
+        });
+        // first, check if response has the proper headers
+        if (!(0,lodash__WEBPACK_IMPORTED_MODULE_0__.has)(result, 'feed') || !(0,lodash__WEBPACK_IMPORTED_MODULE_0__.has)(result['feed'], 'entry')) {
+            throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.ResponseBodyShapeError();
         }
-        const result = yield response.json().catch(() => { return null; });
-        if (result == null) {
-            throw Error('(parsing error)');
-        }
-        // remove the sheet headers and only return the values inside the sheet
-        // if there are no values return empty Array
-        return (_a = result['feed']['entry']) !== null && _a !== void 0 ? _a : [];
+        // then, remove the sheet headers and only return the values inside the sheet
+        return result['feed']['entry'];
+    });
+}
+function fetchAllSheets(masterSheetId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const data = yield fetchSheet(masterSheetId, 1).catch((err) => {
+            throw `Could not access Master Sheet ${err.message}`;
+        });
+        console.log(data);
     });
 }
 
@@ -17231,20 +17408,20 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const search_button = document.getElementById('search_button');
-const refresh_button = document.getElementById('refresh_button');
+const searchButton = document.getElementById('search_button');
+const refreshButton = document.getElementById('refresh_button');
+const masterSheet = '1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg';
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     var a = yield webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__.browser.storage.local.get('unknown');
-    if (lodash__WEBPACK_IMPORTED_MODULE_1__.isEmpty(a)) {
-        const data = yield _functions__WEBPACK_IMPORTED_MODULE_2__.fetchSheet('1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg', 1).catch((err) => { return `Could not access Master Sheet ${err.message}`; });
-        console.log(data);
+    if ((0,lodash__WEBPACK_IMPORTED_MODULE_1__.isEmpty)(a)) {
+        _functions__WEBPACK_IMPORTED_MODULE_2__.fetchAllSheets(masterSheet);
     }
 }));
-search_button.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log('click lmao');
+searchButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    const data = _functions__WEBPACK_IMPORTED_MODULE_2__.fetchSheet(masterSheet, 1);
+    console.log(data);
 }));
-refresh_button.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
-}));
+refreshButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () { }));
 
 
 /***/ }),

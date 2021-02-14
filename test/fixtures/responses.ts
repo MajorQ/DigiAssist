@@ -68,8 +68,6 @@ export const success = {
 	},
 };
 
-export const not_json = 1;
-
 export const empty = {
 	version: '1.0',
 	encoding: 'UTF-8',
