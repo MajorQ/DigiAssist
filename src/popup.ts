@@ -1,6 +1,6 @@
 import { browser } from 'webextension-polyfill-ts';
 import { isEmpty } from 'lodash';
-import * as func from './functions';
+import { GoogleSheetAPI as api} from './sheets_api';
 
 const searchButton = document.getElementById('search_button');
 const refreshButton = document.getElementById('refresh_button');
@@ -10,13 +10,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 	var a = await browser.storage.local.get('unknown');
 
 	if (isEmpty(a)) {
-		func.fetchAllSheets(masterSheet);
+		api.fetchSheetsFrom(masterSheet)
 	}
 });
 
-searchButton.addEventListener('click', async () => {
-	const data = func.fetchSheet(masterSheet, 1);
-	console.log(data);
-});
+searchButton.addEventListener('click', async () => {});
 
-refreshButton.addEventListener('click', async () => {});
+refreshButton.addEventListener('click', async () => {
+	api.fetchSheetsFrom(masterSheet);
+});

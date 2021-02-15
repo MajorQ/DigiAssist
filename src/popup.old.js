@@ -177,7 +177,7 @@ async function fetchAllSheets() {
   await Promise.all(
     entries.map(async (entry) => {
       const name = entry["gsx$namapraktikum"]["$t"];
-      const sheet_index = (entry["gsx$sheetindex"]["$t"] === "") ? 2 : parseInt(entry["gsx$sheetid"]["$t"] === "");
+      const sheet_index = (entry["gsx$sheetindex"]["$t"] === "") ? 2 : parseInt(entry["gsx$sheetid"]["$t"]);
       const sheet_id = entry["gsx$sheetid"]["$t"];
       try {
         const array = await fetchSheet(sheet_id, sheet_index);
