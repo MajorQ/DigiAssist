@@ -1,26 +1,23 @@
-import { browser } from 'webextension-polyfill-ts';
-import { isEmpty } from 'lodash';
-import { FetchSheetsAPI } from './fetch_sheets_api';
-import { SheetsAPI } from './core/sheets_api';
+
+import { BrowserDataStore } from './data/data_store';
+import { Repository } from './data/repository';
+import { FetchSheetsAPI } from './data/sheets_api';
 
 const searchButton = document.getElementById('search_button');
 const refreshButton = document.getElementById('refresh_button');
 const masterSheet = '1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg';
 const dummySheet = '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ'
 
-const sheetsAPI : SheetsAPI = new FetchSheetsAPI();
+const repository = new Repository(new BrowserDataStore, new FetchSheetsAPI(), dummySheet);
 
 document.addEventListener('DOMContentLoaded', async () => {
-	var a = await browser.storage.local.get('unknown');
-
-	if (isEmpty(a)) {
-		const data = await sheetsAPI.fetchSheet(dummySheet, 3).catch(console.log);
-		console.log(data);
-	}
+	// update the UI
+	// fetch data from repository
 });
 
-searchButton.addEventListener('click', async () => {});
+searchButton.addEventListener('click', async () => {
+	// search for praktikan from repository data
+});
 
 refreshButton.addEventListener('click', async () => {
-	sheetsAPI.fetchSheetsFrom(masterSheet);
 });

@@ -1,5 +1,5 @@
 export class Praktikum {
-	private readonly _data: object
+	private readonly _data: object;
 	constructor(
 		public readonly name: string,
 		public readonly sheetId: string,
@@ -16,15 +16,4 @@ export class Praktikum {
 	addData(data: object[]) {
 		return new Praktikum(this.name, this.sheetId, this.gid, data);
 	}
-}
-
-export class PraktikumBuilder extends Praktikum {
-	public readonly sheetIndex: number;
-	static fromSheet(sheet: object) {	
-		return new Praktikum(
-			sheet['gsx$namapraktikum']['$t'],
-			sheet['gsx$sheetid']['$t'],
-			sheet['gsx$gid']['$t']
-		);
-	}	
 }

@@ -1,15 +1,15 @@
 import { enableFetchMocks } from 'jest-fetch-mock';
 enableFetchMocks();
 
-import { FetchSheetsAPI } from '../src/fetch_sheets_api';
+import { FetchSheetsAPI } from '../../src/data/sheets_api';
 const mockAPI = new FetchSheetsAPI();
-import * as mockResponses from './fixtures/responses';
+
+import * as mockResponses from '../fixtures/responses';
 import {
 	FetchError,
 	ResponseBodyShapeError,
 	ResponseParseError,
-} from '../src/classes/errors';
-import { PraktikumBuilder } from '../src/classes/praktikum';
+} from '../../src/classes/errors';
 
 describe('fetchSheet', () => {
 	const tSheetId = 'test_id';
@@ -65,6 +65,8 @@ describe('fetchSheet', () => {
 			.fetchSheet(tSheetId, tSheetIndex)
 			.catch((err: Error) => err);
 		expect(data).toBeInstanceOf(ResponseParseError);
+		// just to make sure this actually works properly
+		expect(data).not.toBeInstanceOf(FetchError); 
 	});
 
 	it('should throw a ResponseBodyShapeError if sheet is empty', async () => {
@@ -76,30 +78,3 @@ describe('fetchSheet', () => {
 	});
 });
 
-describe('fetchSheetsFrom', () => {
-	const tMasterSheet = 'test_sheet';
-	const tFetchResult = JSON.parse(mockResponses.success).feed.entry;
-	const tData = [{}];
-	const mockFetchSheet = jest.spyOn(mockAPI, 'fetchSheet');
-
-	beforeEach(() => {
-		mockFetchSheet.mockClear();
-	});
-
-	it('should call fetch sheet', async () => {
-		mockFetchSheet.mockResolvedValue(tFetchResult);
-		await mockAPI.fetchSheetsFrom(tMasterSheet);
-		expect(mockFetchSheet).toBeCalledWith(tMasterSheet, 1);
-	});
-
-	it('should return an array of praktikum if successful', async () => {
-		mockFetchSheet.mockResolvedValue(tData)
-		mockFetchSheet.mockResolvedValueOnce(tFetchResult);
-		const data = await mockAPI.fetchSheetsFrom(tMasterSheet);
-		const tPraktikumResult = tFetchResult.map((tResult: object) => {
-			const tmp = PraktikumBuilder.fromSheet(tResult);
-			return tmp.addData(tData);
-		});
-		expect(data).toStrictEqual(tPraktikumResult);
-	});
-});
