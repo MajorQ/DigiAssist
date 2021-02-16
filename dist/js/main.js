@@ -17322,63 +17322,36 @@ class ResponseBodyShapeError extends ts_custom_error__WEBPACK_IMPORTED_MODULE_0_
 
 /***/ }),
 
-/***/ "./src/functions.ts":
-/*!**************************!*\
-  !*** ./src/functions.ts ***!
-  \**************************/
+/***/ "./src/classes/praktikum.ts":
+/*!**********************************!*\
+  !*** ./src/classes/praktikum.ts ***!
+  \**********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "fetchSheet": () => (/* binding */ fetchSheet),
-/* harmony export */   "fetchAllSheets": () => (/* binding */ fetchAllSheets)
+/* harmony export */   "Praktikum": () => (/* binding */ Praktikum),
+/* harmony export */   "PraktikumBuilder": () => (/* binding */ PraktikumBuilder)
 /* harmony export */ });
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _classes_errors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./classes/errors */ "./src/classes/errors.ts");
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-function fetchSheet(sheet_id, sheet_index) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const url = `https://spreadsheets.google.com/feeds/list/${sheet_id}/${sheet_index}/public/values?alt=json`;
-        const response = yield fetch(url)
-            .then((response) => {
-            if (!response.ok || response.status !== 200) {
-                throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.FetchError(response.status);
-            }
-            return response;
-        })
-            .catch(() => {
-            throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.FetchError(0);
-        });
-        const result = yield response.json().catch(() => {
-            throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.ResponseParseError();
-        });
-        // first, check if response has the proper headers
-        if (!(0,lodash__WEBPACK_IMPORTED_MODULE_0__.has)(result, 'feed') || !(0,lodash__WEBPACK_IMPORTED_MODULE_0__.has)(result['feed'], 'entry')) {
-            throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.ResponseBodyShapeError();
-        }
-        // then, remove the sheet headers and only return the values inside the sheet
-        return result['feed']['entry'];
-    });
+class Praktikum {
+    constructor(name, sheetId, gid, data) {
+        this.name = name;
+        this.sheetId = sheetId;
+        this.gid = gid;
+        this._data = data;
+    }
+    get data() {
+        return this._data;
+    }
+    addData(data) {
+        return new Praktikum(this.name, this.sheetId, this.gid, data);
+    }
 }
-function fetchAllSheets(masterSheetId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const data = yield fetchSheet(masterSheetId, 1).catch((err) => {
-            throw `Could not access Master Sheet ${err.message}`;
-        });
-        console.log(data);
-    });
+class PraktikumBuilder extends Praktikum {
+    static fromSheet(sheet) {
+        return new Praktikum(sheet['gsx$namapraktikum']['$t'], sheet['gsx$sheetid']['$t'], sheet['gsx$gid']['$t']);
+    }
 }
 
 
@@ -17395,7 +17368,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! webextension-polyfill-ts */ "./node_modules/webextension-polyfill-ts/lib/index.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _functions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./functions */ "./src/functions.ts");
+/* harmony import */ var _sheets_api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./sheets_api */ "./src/sheets_api.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17411,17 +17384,120 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 const searchButton = document.getElementById('search_button');
 const refreshButton = document.getElementById('refresh_button');
 const masterSheet = '1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg';
+const dummySheet = '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ';
+const api = new _sheets_api__WEBPACK_IMPORTED_MODULE_2__.SheetsAPI();
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     var a = yield webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__.browser.storage.local.get('unknown');
     if ((0,lodash__WEBPACK_IMPORTED_MODULE_1__.isEmpty)(a)) {
-        _functions__WEBPACK_IMPORTED_MODULE_2__.fetchAllSheets(masterSheet);
+        const data = yield api.fetchSheet(dummySheet, 3).catch(console.log);
+        console.log(data);
     }
 }));
-searchButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
-    const data = _functions__WEBPACK_IMPORTED_MODULE_2__.fetchSheet(masterSheet, 1);
-    console.log(data);
+searchButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () { }));
+refreshButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    api.fetchSheetsFrom(masterSheet);
 }));
-refreshButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () { }));
+
+
+/***/ }),
+
+/***/ "./src/sheets_api.ts":
+/*!***************************!*\
+  !*** ./src/sheets_api.ts ***!
+  \***************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "SheetsAPI": () => (/* binding */ SheetsAPI)
+/* harmony export */ });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _classes_errors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./classes/errors */ "./src/classes/errors.ts");
+/* harmony import */ var _classes_praktikum__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./classes/praktikum */ "./src/classes/praktikum.ts");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+
+class SheetsAPI {
+    fetchSheet(sheet_id, sheet_index) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `https://spreadsheets.google.com/feeds/list/${sheet_id}/${sheet_index}/public/values?alt=json`;
+            const response = yield fetch(url).catch(() => {
+                throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.FetchError(0);
+            });
+            if (!response.ok || response.status !== 200) {
+                throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.FetchError(response.status);
+            }
+            const result = yield response.json().catch(() => {
+                throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.ResponseParseError();
+            });
+            // first, check if response has the proper headers
+            if (!(0,lodash__WEBPACK_IMPORTED_MODULE_0__.has)(result, 'feed') || !(0,lodash__WEBPACK_IMPORTED_MODULE_0__.has)(result['feed'], 'entry')) {
+                throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.ResponseBodyShapeError();
+            }
+            // then, remove the sheet headers and only return the values inside the sheet
+            return result['feed']['entry'];
+        });
+    }
+    fetchSheetsFrom(masterSheetId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sheets = yield this.fetchSheet(masterSheetId, 1).catch((err) => {
+                const message = `Could not access Master Sheet ${err.message}`;
+                throw new Error(message);
+            });
+            let result;
+            yield Promise.all(sheets.map((sheet) => __awaiter(this, void 0, void 0, function* () {
+                const praktikum = _classes_praktikum__WEBPACK_IMPORTED_MODULE_2__.PraktikumBuilder.fromSheet(sheet);
+                const data = yield this.fetchSheet(praktikum.sheetId, (0,_utils__WEBPACK_IMPORTED_MODULE_3__.parseSheetIndex)(sheet['gsx$namapraktikum']['$t'])).catch((err) => {
+                    const message = `Could not access ${praktikum.name} Sheet ${err.message}`;
+                    throw new Error(message);
+                });
+                result.push(praktikum.addData(data));
+            })));
+            return result;
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/utils.ts":
+/*!**********************!*\
+  !*** ./src/utils.ts ***!
+  \**********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "parseSheetIndex": () => (/* binding */ parseSheetIndex),
+/* harmony export */   "convertColumnToLetter": () => (/* binding */ convertColumnToLetter)
+/* harmony export */ });
+function parseSheetIndex(sheetIndex) {
+    return sheetIndex === '' ? 2 : parseInt(sheetIndex);
+}
+// https://stackoverflow.com/questions/21229180/convert-column-index-into-corresponding-column-letter
+function convertColumnToLetter(number) {
+    const base = Math.floor(number / 26);
+    const result = base >= 0
+        ? convertColumnToLetter(base - 1) +
+            String.fromCharCode(65 + (number % 26))
+        : '';
+    return result;
+}
 
 
 /***/ }),

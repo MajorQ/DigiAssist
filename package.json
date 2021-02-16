@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build": "webpack",
+		"sandbox": "ts-node ./test/sandbox.ts",
 		"test": "jest"
 	},
 	"keywords": [],

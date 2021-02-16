@@ -5,13 +5,11 @@ import {
 	ResponseParseError,
 } from './classes/errors';
 import { Praktikum, PraktikumBuilder } from './classes/praktikum';
+import { SheetsAPI } from './core/sheets_api';
 import { parseSheetIndex } from './utils';
 
-export namespace GoogleSheetAPI {
-	export async function fetchSheet(
-		sheet_id: string,
-		sheet_index: number
-	): Promise<object[]> {
+export class FetchSheetsAPI implements SheetsAPI {
+	async fetchSheet(sheet_id: string, sheet_index: number): Promise<object[]> {
 		const url = `https://spreadsheets.google.com/feeds/list/${sheet_id}/${sheet_index}/public/values?alt=json`;
 
 		const response = await fetch(url).catch(() => {
@@ -35,15 +33,15 @@ export namespace GoogleSheetAPI {
 		return result['feed']['entry'];
 	}
 
-	export async function fetchSheetsFrom(
-		masterSheetId: string
-	): Promise<Praktikum[]> {
-		const sheets = await fetchSheet(masterSheetId, 1).catch((err: Error) => {
-			const message = `Could not access Master Sheet ${err.message}`;
-			throw new Error(message);
-		});
+	async fetchSheetsFrom(masterSheetId: string): Promise<Praktikum[]> {
+		const sheets = await this.fetchSheet(masterSheetId, 1).catch(
+			(err: Error) => {
+				const message = `Could not access Master Sheet ${err.message}`;
+				throw new Error(message);
+			}
+		);
 
-		let result: Praktikum[];
+		let result: Praktikum[] = [];
 		await Promise.all(
 			sheets.map(async (sheet: object) => {
 				const praktikum = PraktikumBuilder.fromSheet(sheet);

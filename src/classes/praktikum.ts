@@ -13,7 +13,7 @@ export class Praktikum {
 		return this._data;
 	}
 
-	addData(data: object) {
+	addData(data: object[]) {
 		return new Praktikum(this.name, this.sheetId, this.gid, data);
 	}
 }
