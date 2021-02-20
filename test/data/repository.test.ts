@@ -35,8 +35,8 @@ describe('fetchSheetsFrom', () => {
 	});
 
 	it('should return an array of praktikum if successful', async () => {
-		mockFetchSheet.mockResolvedValue(tData);
-		mockFetchSheet.mockResolvedValueOnce(tFetchResult);
+		mockFetchSheet.mockResolvedValueOnce(tFetchResult); //  mock fetch from Master Shet
+		mockFetchSheet.mockResolvedValue(tData); // mock for other sheets
 		const data = await fetchSheetsFromPublic();
 		const tPraktikumResult = tFetchResult.map((tResult: object) => {
 			const tmp = PraktikumModel.fromSheet(tResult);
@@ -49,5 +49,18 @@ describe('fetchSheetsFrom', () => {
 		mockFetchSheet.mockRejectedValueOnce(new FetchError(0));
 		const data = await fetchSheetsFromPublic();
 		expect(data).toBeInstanceOf(FetchError);
+	});
+
+	it('should not stop even after one sheet (aside from MasterSheet) has an error', async () => {
+		mockFetchSheet.mockResolvedValue(tData);
+		mockFetchSheet.mockResolvedValueOnce(tFetchResult);
+		mockFetchSheet.mockRejectedValueOnce(new FetchError());
+		const data = await fetchSheetsFromPublic();
+		const tPraktikumResult = tFetchResult.map((tResult: object) => {
+			const tmp = PraktikumModel.fromSheet(tResult);
+			return tmp.addData(tData);
+		});
+		expect(data).toStrictEqual(tPraktikumResult);
+		expect(data).not.toThrowError;
 	});
 });

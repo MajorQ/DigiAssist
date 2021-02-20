@@ -1,9 +1,10 @@
 {
     "compilerOptions": {
         "target": "ES2015",
-        "watch": true,
         "lib": ["ES2015", "DOM"],
         "moduleResolution": "Node",
-        "esModuleInterop": true
-    }
+        "esModuleInterop": true,
+        "strict": false,
+        "watch": true  
+    },
 }

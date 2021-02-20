@@ -11,6 +11,7 @@ const dummySheet = '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ'
 const repository = new Repository(new BrowserDataStore, new FetchSheetsAPI(), dummySheet);
 
 document.addEventListener('DOMContentLoaded', async () => {
+	
 	// update the UI
 	// fetch data from repository
 });

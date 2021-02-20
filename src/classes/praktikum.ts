@@ -1,19 +1,17 @@
-export class Praktikum {
-	private readonly _data: object;
-	constructor(
-		public readonly name: string,
-		public readonly sheetId: string,
-		public readonly gid: string,
-		data?: object
-	) {
-		this._data = data;
-	}
+// TODO: maybe refactor with Either in the future so it can be more reusable
 
-	get data() {
-		return this._data;
-	}
+import { Either } from "../lib/either";
 
-	addData(data: object[]) {
-		return new Praktikum(this.name, this.sheetId, this.gid, data);
-	}
+export interface PraktikumSuccess {
+	name: string;
+	sheetID: string;
+	gid: string;
+	data: object[];
 }
+
+export interface PraktikumFailure {
+	name: string;
+	error: Error;
+}
+
+export type Praktikum = Either<PraktikumFailure, PraktikumSuccess>;

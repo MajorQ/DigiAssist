@@ -1,8 +1,9 @@
 import { browser } from 'webextension-polyfill-ts';
+import { Praktikum } from '../classes/praktikum';
 
 export interface DataStore {
 	fetch(): Promise<{ [s: string]: any }>;
-	store(data: object[]): void;
+	store(data: Praktikum[]): void;
 }
 
 export class BrowserDataStore implements DataStore {
@@ -11,7 +12,7 @@ export class BrowserDataStore implements DataStore {
 		return data;
 	}
 
-	async store(data: object[]) {
+	async store(data: Praktikum[]) {
 		await browser.storage.local.set({
 			praktikum: data,
 			time: Date.now(),

@@ -2,8 +2,13 @@ import { DataStore } from './data_store';
 import { SheetsAPI } from './sheets_api';
 import { isEmpty } from 'lodash';
 
-import { PraktikumModel } from './models/praktikum_model';
 import { parseSheetIndex } from '../utils';
+import {
+	Praktikum,
+	PraktikumFailure,
+	PraktikumSuccess,
+} from '../classes/praktikum';
+import * as E from '../lib/either';
 
 export class Repository {
 	constructor(
@@ -12,52 +17,65 @@ export class Repository {
 		private masterSheetId: string
 	) {}
 
-	async getPraktikumData() {
+	async getPraktikumData(): Promise<E.Either<PraktikumFailure, Praktikum[]>> {
 		const cachedData = await this.dataStore.fetch();
 
 		if (isEmpty(cachedData)) {
-			const data = await this.fetchSheetsFrom(this.masterSheetId);
-			this.dataStore.store(data);
+			const data = await this.fetchSheets(this.masterSheetId);
+
+			if (E.isRight(data)) {
+				this.dataStore.store(data.right);
+			}
+
 			return data;
 		}
 
 		if (Date.now() - cachedData.cacheTime > 3600 * 1000) {
-			const data = await this.fetchSheetsFrom(this.masterSheetId);
-			this.dataStore.store(data);
+			const data = await this.fetchSheets(this.masterSheetId);
+
+			if (E.isRight(data)) {
+				this.dataStore.store(data.right);
+			}
+
 			return data;
 		}
 
-		return cachedData;
+		return E.right(cachedData as Praktikum[]);
 	}
 
-	searchPraktikan(name: string) {}
-
-	private async fetchSheetsFrom(
+	private async fetchSheets(
 		masterSheetId: string
-	): Promise<PraktikumModel[]> {
-		const sheets = await this.sheetsAPI
-			.fetchSheet(masterSheetId, 1)
-			.catch((err: Error) => {
-				err.message = `Could not access Master Sheet ${err.message}`;
-				throw err;
-			});
+	): Promise<E.Either<PraktikumFailure, Praktikum[]>> {
+		const result = await this.fetchMasterSheet(masterSheetId);
 
-		let result: PraktikumModel[] = [];
-		await Promise.all(
-			sheets.map(async (sheet: object) => {
-				const praktikum = PraktikumModel.fromSheet(sheet);
-				const data = await this.sheetsAPI
-					.fetchSheet(
-						praktikum.sheetId,
-						parseSheetIndex(sheet['gsx$namapraktikum']['$t'])
-					)
-					.catch((err: Error) => {
-						err.message = `Could not access ${praktikum.name} Sheet ${err.message}`;
-						throw err;
-					});
-				result.push(praktikum.addData(data));
+		if (E.isRight(result)) {
+			return E.right(await this.fetchOtherSheets(result.right));
+		} else {
+			return E.left(result.left);
+		}
+	}
+
+	private async fetchMasterSheet(masterSheetId: string): Promise<Praktikum> {
+		return this.sheetsAPI.fetchSheetPraktikum(
+			'Master Sheet',
+			masterSheetId,
+			'0',
+			1
+		);
+	}
+
+	private async fetchOtherSheets(
+		praktikum: PraktikumSuccess
+	): Promise<Praktikum[]> {
+		return Promise.all<Praktikum>(
+			praktikum.data.map(async (sheet: object) => {
+				return this.sheetsAPI.fetchSheetPraktikum(
+					sheet['gsx$namapraktikum']['$t'],
+					sheet['gsx$sheetid']['$t'],
+					sheet['gsx$gid']['$t'],
+					parseSheetIndex(sheet['gsx$namapraktikum']['$t'])
+				);
 			})
 		);
-		return result;
 	}
 }

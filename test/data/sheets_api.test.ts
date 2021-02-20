@@ -23,13 +23,15 @@ describe('fetchSheet', () => {
 
 	it('should call fetch', async () => {
 		global.fetch.mockResponseOnce(mockResponses.success);
-		await mockAPI.fetchSheet(tSheetId, tSheetIndex);
+		await mockAPI.fetchSheet(tSheetId, tSheetIndex).catch();
 		expect(global.fetch).toBeCalledWith(tURL);
 	});
 
 	it('should return array of objects if fetch is successful', async () => {
 		global.fetch.mockResponseOnce(mockResponses.success);
-		const data = await mockAPI.fetchSheet(tSheetId, tSheetIndex);
+		const data = await mockAPI
+			.fetchSheet(tSheetId, tSheetIndex)
+			.catch((err) => err);
 		expect(data).toStrictEqual(tResult);
 	});
 
@@ -39,7 +41,7 @@ describe('fetchSheet', () => {
 		});
 		const data = await mockAPI
 			.fetchSheet(tSheetId, tSheetIndex)
-			.catch((err: Error) => err);
+			.catch((err) => err);
 		expect(data).toBeInstanceOf(FetchError);
 	});
 
@@ -47,7 +49,7 @@ describe('fetchSheet', () => {
 		global.fetch.mockAbortOnce();
 		const data = await mockAPI
 			.fetchSheet(tSheetId, tSheetIndex)
-			.catch((err: Error) => err);
+			.catch((err) => err);
 		expect(data).toBeInstanceOf(FetchError);
 	});
 
@@ -55,7 +57,7 @@ describe('fetchSheet', () => {
 		global.fetch.mockRejectOnce();
 		const data = await mockAPI
 			.fetchSheet(tSheetId, tSheetIndex)
-			.catch((err: Error) => err);
+			.catch((err) => err);
 		expect(data).toBeInstanceOf(FetchError);
 	});
 
@@ -63,18 +65,17 @@ describe('fetchSheet', () => {
 		global.fetch.mockResponseOnce('unparsable response');
 		const data = await mockAPI
 			.fetchSheet(tSheetId, tSheetIndex)
-			.catch((err: Error) => err);
+			.catch((err) => err);
 		expect(data).toBeInstanceOf(ResponseParseError);
 		// just to make sure this actually works properly
-		expect(data).not.toBeInstanceOf(FetchError); 
+		expect(data).not.toBeInstanceOf(FetchError);
 	});
 
 	it('should throw a ResponseBodyShapeError if sheet is empty', async () => {
 		global.fetch.mockResponseOnce(mockResponses.empty);
 		const data = await mockAPI
 			.fetchSheet(tSheetId, tSheetIndex)
-			.catch((err: Error) => err);
+			.catch((err) => err);
 		expect(data).toBeInstanceOf(ResponseBodyShapeError);
 	});
 });
-
