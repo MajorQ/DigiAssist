@@ -17,3 +17,9 @@ export class ResponseBodyShapeError extends CustomError {
 		super('(object shape error)');
 	}
 }
+
+export class CacheError extends CustomError {
+	constructor() {
+		super('(could not access cache)');
+	}
+}

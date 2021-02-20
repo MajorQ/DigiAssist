@@ -1,80 +1,97 @@
 import { DataStore } from './data_store';
 import { SheetsAPI } from './sheets_api';
-import { isEmpty } from 'lodash';
+import { isEmpty, isUndefined } from 'lodash';
 
-import { getColumn, parseSheetIndex } from '../utils';
+import { getColumn, getURL, parseSheetIndex } from '../utils';
 import {
 	Praktikum,
-	PraktikumFailure,
 	PraktikumSuccess,
+	PraktikumList,
+	praktikumListFailure,
+	praktikumListSuccess,
+	praktikumListEmpty,
 } from '../classes/praktikum';
-import * as E from '../lib/either';
 import { Result } from '../classes/result';
+import { match, matchI } from 'ts-adt';
 
 export class Repository {
 	constructor(private dataStore: DataStore, private sheetsAPI: SheetsAPI) {}
 
 	searchPraktikan(
 		inputNPM: string,
-		praktikumList: Praktikum[],
+		praktikumList: PraktikumSuccess[],
 		modul: string
-	): Result {
-		for (let praktikum of praktikumList) {
-			if (E.isRight(praktikum)) {
-				const data = praktikum.right.data;
-				const index = data.findIndex(
-					(praktikan) => praktikan['gsx$npm']['$t'] === inputNPM
-				);
-				if (index !== -1) {
-					return {
-						name: data[index]['gsx$nama']['$t'],
-						row: index + 2,
-						column: getColumn(data[index]['content']['$t'], modul),
-						praktikum: praktikum.right,
-					};
-				}
+	): Result[] {
+		let results: Result[];
+		praktikumList.forEach((praktikum) => {
+			const data = praktikum.data;
+			const index = data.findIndex(
+				(praktikan) => praktikan['gsx$npm']['$t'] === inputNPM
+			);
+			if (index !== -1) {
+				results.push({
+					name: data[index]['gsx$nama']['$t'],
+					prak_name: praktikum.name,
+					url: getURL(
+						praktikum.sheetID,
+						praktikum.gid,
+						getColumn(data[index]['content']['$t'], modul),
+						index + 2
+					),
+				});
 			}
-		}
+		});
+		return results;
 	}
 
-	async getPraktikumData(
-		masterSheetID: string
-	): Promise<E.Either<PraktikumFailure, Praktikum[]>> {
+	async getPraktikumData(masterSheetID: string): Promise<any> {
 		const cachedData = await this.dataStore.fetch();
 
-		if (isEmpty(cachedData)) {
-			const data = await this.fetchSheets(masterSheetID);
-
-			if (E.isRight(data)) {
-				this.dataStore.store(data.right);
-			}
-
-			return data;
-		}
-
-		if (Date.now() - cachedData.time > 3600 * 1000) {
-			const data = await this.fetchSheets(masterSheetID);
-
-			if (E.isRight(data)) {
-				this.dataStore.store(data.right);
-			}
-
-			return data;
-		}
-
-		return E.right(cachedData.praktikum);
+		// If cacheData is empty, then fetch again and return
+		matchI(cachedData)({
+			empty: async () => {
+				const fetchData = await this.fetchSheets(masterSheetID);
+				return matchI(fetchData)({
+					empty: () => {
+						return praktikumListEmpty();
+					},
+					failure: ({ value }) => {
+						return praktikumListFailure(value);
+					},
+					success: ({ value }) => {
+						return praktikumListSuccess(value);
+					},
+				});
+			},
+			failure: ({ value }) => {
+				return praktikumListFailure(value);
+			},
+			success: ({ value }) => {
+				if (Date.now() - value.time > 3600 * 1000) {
+					
+				}
+				return cachedData;
+			},
+		});
 	}
 
-	async fetchSheets(
-		masterSheetID: string
-	): Promise<E.Either<PraktikumFailure, Praktikum[]>> {
-		const result = await this.fetchMasterSheet(masterSheetID);
+	async fetchSheets(masterSheetID: string): Promise<PraktikumList> {
+		const masterSheetData = await this.fetchMasterSheet(masterSheetID);
 
-		if (E.isRight(result)) {
-			return E.right(await this.fetchOtherSheets(result.right));
-		} else {
-			return E.left(result.left);
-		}
+		// If master sheet failed, then return the failure
+		// else, return data as empty or success
+		return matchI(masterSheetData)({
+			failure: ({ value }) => {
+				return praktikumListFailure(value.error);
+			},
+			success: async ({ value }) => {
+				const data = await this.fetchOtherSheets(value);
+				if (isUndefined(data) || isEmpty(data)) {
+					return praktikumListEmpty();
+				}
+				return praktikumListSuccess(data);
+			},
+		});
 	}
 
 	private async fetchMasterSheet(masterSheetId: string): Promise<Praktikum> {

@@ -35,7 +35,7 @@ export function createResultBox(res: Result) {
 	box.style.margin = '5px 0px';
 	box.onclick = () => {
 		browser.tabs.create({
-			url: getURL(res),
+			url: res.url,
 		});
 	};
 
@@ -45,7 +45,7 @@ export function createResultBox(res: Result) {
 	box.appendChild(student_name);
 
 	const prak_name = document.createElement('p');
-	prak_name.innerHTML = res.praktikum.name;
+	prak_name.innerHTML = res.prak_name;
 	box.appendChild(prak_name);
 
 	result.appendChild(box);

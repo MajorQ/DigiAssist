@@ -1,6 +1,3 @@
-const myArray = [1, 2, 3, 4]
-const newArray = myArray.map((element: number) => {
-    return element * 2;
-})
-console.log(myArray);
-console.log(newArray);
+import { browser } from "webextension-polyfill-ts";
+
+browser.storage.local.get('unknownKey').then(console.log)

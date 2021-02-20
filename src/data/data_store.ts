@@ -1,16 +1,27 @@
+import { isEmpty } from 'lodash';
 import { browser } from 'webextension-polyfill-ts';
-import { Praktikum } from '../classes/praktikum';
+import { CacheError } from '../classes/errors';
+import {
+	Praktikum,
+	CachePraktikum,
+	cacheFailure,
+	cacheSuccess,
+	cacheEmpty,
+} from '../classes/praktikum';
 
 export interface DataStore {
-	fetch(): Promise<{ praktikum: Praktikum[]; time: number }>;
+	fetch(): Promise<CachePraktikum>;
 	store(data: Praktikum[]): void;
 }
 
-// TODO: this function may fail, should return either 
 export class BrowserDataStore implements DataStore {
-	async fetch(): Promise<{ praktikum: Praktikum[]; time: number }> {
-		const data = await browser.storage.local.get(['cache, cacheTime']);
-		return { praktikum: data.praktikum, time: data.time };
+	async fetch(): Promise<CachePraktikum> {
+		return await browser.storage.local
+			.get(['praktikum, time'])
+			.then((data: {praktikum: Praktikum[], time: number}) =>
+				isEmpty(data) ? cacheEmpty() : cacheSuccess(data.praktikum, data.time)
+			)
+			.catch(() => cacheFailure(new CacheError()));
 	}
 
 	async store(data: Praktikum[]) {

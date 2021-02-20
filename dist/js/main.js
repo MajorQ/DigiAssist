@@ -17299,7 +17299,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "FetchError": () => (/* binding */ FetchError),
 /* harmony export */   "ResponseParseError": () => (/* binding */ ResponseParseError),
-/* harmony export */   "ResponseBodyShapeError": () => (/* binding */ ResponseBodyShapeError)
+/* harmony export */   "ResponseBodyShapeError": () => (/* binding */ ResponseBodyShapeError),
+/* harmony export */   "CacheError": () => (/* binding */ CacheError)
 /* harmony export */ });
 /* harmony import */ var ts_custom_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ts-custom-error */ "./node_modules/ts-custom-error/dist/custom-error.mjs");
 
@@ -17318,57 +17319,28 @@ class ResponseBodyShapeError extends ts_custom_error__WEBPACK_IMPORTED_MODULE_0_
         super('(object shape error)');
     }
 }
+class CacheError extends ts_custom_error__WEBPACK_IMPORTED_MODULE_0__.CustomError {
+    constructor() {
+        super('(could not access cache)');
+    }
+}
 
 
 /***/ }),
 
-/***/ "./src/classes/praktikum.ts":
-/*!**********************************!*\
-  !*** ./src/classes/praktikum.ts ***!
-  \**********************************/
+/***/ "./src/data/data_store.ts":
+/*!********************************!*\
+  !*** ./src/data/data_store.ts ***!
+  \********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Praktikum": () => (/* binding */ Praktikum),
-/* harmony export */   "PraktikumBuilder": () => (/* binding */ PraktikumBuilder)
+/* harmony export */   "BrowserDataStore": () => (/* binding */ BrowserDataStore)
 /* harmony export */ });
-class Praktikum {
-    constructor(name, sheetId, gid, data) {
-        this.name = name;
-        this.sheetId = sheetId;
-        this.gid = gid;
-        this._data = data;
-    }
-    get data() {
-        return this._data;
-    }
-    addData(data) {
-        return new Praktikum(this.name, this.sheetId, this.gid, data);
-    }
-}
-class PraktikumBuilder extends Praktikum {
-    static fromSheet(sheet) {
-        return new Praktikum(sheet['gsx$namapraktikum']['$t'], sheet['gsx$sheetid']['$t'], sheet['gsx$gid']['$t']);
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/popup.ts":
-/*!**********************!*\
-  !*** ./src/popup.ts ***!
-  \**********************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony import */ var webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! webextension-polyfill-ts */ "./node_modules/webextension-polyfill-ts/lib/index.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _sheets_api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./sheets_api */ "./src/sheets_api.ts");
+/* harmony import */ var _lib_either__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/either */ "./src/lib/either.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17380,43 +17352,42 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 };
 
 
-
-const searchButton = document.getElementById('search_button');
-const refreshButton = document.getElementById('refresh_button');
-const masterSheet = '1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg';
-const dummySheet = '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ';
-const api = new _sheets_api__WEBPACK_IMPORTED_MODULE_2__.SheetsAPI();
-document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
-    var a = yield webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__.browser.storage.local.get('unknown');
-    if ((0,lodash__WEBPACK_IMPORTED_MODULE_1__.isEmpty)(a)) {
-        const data = yield api.fetchSheet(dummySheet, 3).catch(console.log);
-        console.log(data);
+// TODO: this function may fail, should return either 
+class BrowserDataStore {
+    fetch() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const data = yield webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__.browser.storage.local.get(['praktikum, time']);
+            return (0,_lib_either__WEBPACK_IMPORTED_MODULE_1__.right)({ praktikum: data.praktikum, time: data.time });
+        });
     }
-}));
-searchButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () { }));
-refreshButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
-    api.fetchSheetsFrom(masterSheet);
-}));
+    store(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__.browser.storage.local.set({
+                praktikum: data,
+                time: Date.now(),
+            });
+        });
+    }
+}
 
 
 /***/ }),
 
-/***/ "./src/sheets_api.ts":
-/*!***************************!*\
-  !*** ./src/sheets_api.ts ***!
-  \***************************/
+/***/ "./src/data/repository.ts":
+/*!********************************!*\
+  !*** ./src/data/repository.ts ***!
+  \********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "SheetsAPI": () => (/* binding */ SheetsAPI)
+/* harmony export */   "Repository": () => (/* binding */ Repository)
 /* harmony export */ });
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _classes_errors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./classes/errors */ "./src/classes/errors.ts");
-/* harmony import */ var _classes_praktikum__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./classes/praktikum */ "./src/classes/praktikum.ts");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils */ "./src/utils.ts");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/utils.ts");
+/* harmony import */ var _lib_either__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lib/either */ "./src/lib/either.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17429,11 +17400,105 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-
-class SheetsAPI {
-    fetchSheet(sheet_id, sheet_index) {
+class Repository {
+    constructor(dataStore, sheetsAPI) {
+        this.dataStore = dataStore;
+        this.sheetsAPI = sheetsAPI;
+    }
+    searchPraktikan(inputNPM, praktikumList, modul) {
+        let results;
+        praktikumList.forEach((praktikum) => {
+            const data = praktikum.data;
+            const index = data.findIndex((praktikan) => praktikan['gsx$npm']['$t'] === inputNPM);
+            if (index !== -1) {
+                results.push({
+                    name: data[index]['gsx$nama']['$t'],
+                    prak_name: praktikum.name,
+                    url: (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getURL)(praktikum.sheetID, praktikum.gid, (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getColumn)(data[index]['content']['$t'], modul), index + 2),
+                });
+            }
+        });
+        return results;
+    }
+    getPraktikumData(masterSheetID) {
         return __awaiter(this, void 0, void 0, function* () {
-            const url = `https://spreadsheets.google.com/feeds/list/${sheet_id}/${sheet_index}/public/values?alt=json`;
+            const cachedData = yield this.dataStore.fetch();
+            if ((0,lodash__WEBPACK_IMPORTED_MODULE_0__.isEmpty)(cachedData)) {
+                const data = yield this.fetchSheets(masterSheetID);
+                if (_lib_either__WEBPACK_IMPORTED_MODULE_2__.isRight(data)) {
+                    this.dataStore.store(data.right);
+                }
+                return data;
+            }
+            if (Date.now() - cachedData.time > 3600 * 1000) {
+                const fetchData = yield this.fetchSheets(masterSheetID);
+                if (_lib_either__WEBPACK_IMPORTED_MODULE_2__.isRight(fetchData)) {
+                    this.dataStore.store(fetchData.right);
+                }
+                return fetchData;
+            }
+            return _lib_either__WEBPACK_IMPORTED_MODULE_2__.right(cachedData.praktikum);
+        });
+    }
+    fetchSheets(masterSheetID) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const masterSheetData = yield this.fetchMasterSheet(masterSheetID);
+            if (_lib_either__WEBPACK_IMPORTED_MODULE_2__.isRight(masterSheetData)) {
+                return _lib_either__WEBPACK_IMPORTED_MODULE_2__.right(yield this.fetchOtherSheets(masterSheetData.right));
+            }
+            else {
+                return _lib_either__WEBPACK_IMPORTED_MODULE_2__.left(masterSheetData.left);
+            }
+        });
+    }
+    fetchMasterSheet(masterSheetId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.sheetsAPI.fetchSheetPraktikum('Master Sheet', masterSheetId, '0', 1);
+        });
+    }
+    fetchOtherSheets(praktikum) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Promise.all(praktikum.data.map((sheet) => __awaiter(this, void 0, void 0, function* () {
+                return this.sheetsAPI.fetchSheetPraktikum(sheet['gsx$namapraktikum']['$t'], sheet['gsx$sheetid']['$t'], sheet['gsx$gid']['$t'], (0,_utils__WEBPACK_IMPORTED_MODULE_1__.parseSheetIndex)(sheet['gsx$namapraktikum']['$t']));
+            })));
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/data/sheets_api.ts":
+/*!********************************!*\
+  !*** ./src/data/sheets_api.ts ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "FetchSheetsAPI": () => (/* binding */ FetchSheetsAPI)
+/* harmony export */ });
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _classes_errors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../classes/errors */ "./src/classes/errors.ts");
+/* harmony import */ var _lib_either__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lib/either */ "./src/lib/either.ts");
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+class FetchSheetsAPI {
+    fetchSheet(sheetID, sheetIndex) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `https://spreadsheets.google.com/feeds/list/${sheetID}/${sheetIndex}/public/values?alt=json`;
             const response = yield fetch(url).catch(() => {
                 throw new _classes_errors__WEBPACK_IMPORTED_MODULE_1__.FetchError(0);
             });
@@ -17451,24 +17516,186 @@ class SheetsAPI {
             return result['feed']['entry'];
         });
     }
-    fetchSheetsFrom(masterSheetId) {
+    fetchSheetPraktikum(name, sheetID, gid, sheetIndex) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sheets = yield this.fetchSheet(masterSheetId, 1).catch((err) => {
-                const message = `Could not access Master Sheet ${err.message}`;
-                throw new Error(message);
-            });
-            let result;
-            yield Promise.all(sheets.map((sheet) => __awaiter(this, void 0, void 0, function* () {
-                const praktikum = _classes_praktikum__WEBPACK_IMPORTED_MODULE_2__.PraktikumBuilder.fromSheet(sheet);
-                const data = yield this.fetchSheet(praktikum.sheetId, (0,_utils__WEBPACK_IMPORTED_MODULE_3__.parseSheetIndex)(sheet['gsx$namapraktikum']['$t'])).catch((err) => {
-                    const message = `Could not access ${praktikum.name} Sheet ${err.message}`;
-                    throw new Error(message);
-                });
-                result.push(praktikum.addData(data));
-            })));
-            return result;
+            return this.fetchSheet(sheetID, sheetIndex)
+                .then((data) => _lib_either__WEBPACK_IMPORTED_MODULE_2__.right({
+                name,
+                sheetID,
+                gid,
+                data,
+            }))
+                .catch((error) => _lib_either__WEBPACK_IMPORTED_MODULE_2__.left({ name, error }));
         });
     }
+}
+
+
+/***/ }),
+
+/***/ "./src/lib/either.ts":
+/*!***************************!*\
+  !*** ./src/lib/either.ts ***!
+  \***************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "left": () => (/* binding */ left),
+/* harmony export */   "right": () => (/* binding */ right),
+/* harmony export */   "isLeft": () => (/* binding */ isLeft),
+/* harmony export */   "isRight": () => (/* binding */ isRight),
+/* harmony export */   "fold": () => (/* binding */ fold)
+/* harmony export */ });
+const left = (left) => ({ type: 'left', left });
+const right = (right) => ({
+    type: 'right',
+    right,
+});
+const isLeft = (either) => either.type === 'left';
+const isRight = (either) => either.type === 'right';
+const fold = (either, onLeft, onRight) => (isRight(either) ? onRight(either.right) : onLeft(either.left));
+
+
+/***/ }),
+
+/***/ "./src/popup.ts":
+/*!**********************!*\
+  !*** ./src/popup.ts ***!
+  \**********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _data_data_store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./data/data_store */ "./src/data/data_store.ts");
+/* harmony import */ var _data_repository__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./data/repository */ "./src/data/repository.ts");
+/* harmony import */ var _data_sheets_api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./data/sheets_api */ "./src/data/sheets_api.ts");
+/* harmony import */ var _ui__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ui */ "./src/ui.ts");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! webextension-polyfill-ts */ "./node_modules/webextension-polyfill-ts/lib/index.js");
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+
+
+
+const searchButton = document.getElementById('search_button');
+const refreshButton = document.getElementById('refresh_button');
+// actual masterSheet
+// '1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg'
+//
+// dummy Sheet
+// '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ'
+const masterSheetID = '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ';
+const repository = new _data_repository__WEBPACK_IMPORTED_MODULE_1__.Repository(new _data_data_store__WEBPACK_IMPORTED_MODULE_0__.BrowserDataStore(), new _data_sheets_api__WEBPACK_IMPORTED_MODULE_2__.FetchSheetsAPI());
+let praktikumList;
+document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
+    // toggleLoading(State.BUSY);
+    // const masterSheetResult = await repository.getPraktikumData(masterSheetID);
+    // // UGLY
+    // if (isRight(masterSheetResult)) {
+    // 	masterSheetResult.right.forEach((sheet) => {
+    // 		if (isRight(sheet)) {
+    // 		} else {
+    // 			showError(`Could not access ${sheet.left.name} ${sheet.left.error}`);
+    // 		}
+    // 	});
+    // } else {
+    // 	showError(
+    // 		`Could not access ${masterSheetResult.left.name} ${masterSheetResult.left.error}`
+    // 	);
+    // }
+    // toggleLoading(State.IDLE);
+    webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_5__.browser.storage.local.get('unknownKey').then(console.log);
+}));
+searchButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    const NPMField = document.getElementById('npm_text_field').value;
+    const modul = document.getElementById('praktikum_dropdown').value;
+    const results = repository.searchPraktikan(NPMField, praktikumList, modul);
+    if ((0,lodash__WEBPACK_IMPORTED_MODULE_4__.isEmpty)(results)) {
+        results.forEach((result) => (0,_ui__WEBPACK_IMPORTED_MODULE_3__.createResultBox)(result));
+    }
+    else {
+        (0,_ui__WEBPACK_IMPORTED_MODULE_3__.showError)('NPM was not found!');
+    }
+}));
+refreshButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    (0,_ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading)(_ui__WEBPACK_IMPORTED_MODULE_3__.State.BUSY);
+    (0,_ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading)(_ui__WEBPACK_IMPORTED_MODULE_3__.State.IDLE);
+}));
+
+
+/***/ }),
+
+/***/ "./src/ui.ts":
+/*!*******************!*\
+  !*** ./src/ui.ts ***!
+  \*******************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "State": () => (/* binding */ State),
+/* harmony export */   "toggleLoading": () => (/* binding */ toggleLoading),
+/* harmony export */   "showError": () => (/* binding */ showError),
+/* harmony export */   "createResultBox": () => (/* binding */ createResultBox)
+/* harmony export */ });
+/* harmony import */ var webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! webextension-polyfill-ts */ "./node_modules/webextension-polyfill-ts/lib/index.js");
+
+const result = document.getElementById('result');
+const loading = document.getElementById('loading');
+const body = document.getElementById('body');
+var State;
+(function (State) {
+    State["IDLE"] = "IDLE";
+    State["BUSY"] = "BUSY";
+})(State || (State = {}));
+function toggleLoading(state) {
+    if (state === State.IDLE) {
+        loading.style.display = 'none';
+        body.style.display = 'block';
+    }
+    else {
+        body.style.display = 'none';
+        loading.style.display = 'block';
+    }
+}
+function showError(message) {
+    const p = document.createElement('p');
+    p.innerHTML = message;
+    p.style.color = 'red';
+    result.appendChild(p);
+}
+function createResultBox(res) {
+    const box = document.createElement('div');
+    box.style.border = 'medium solid #000000';
+    box.style.padding = '5px';
+    box.style.margin = '5px 0px';
+    box.onclick = () => {
+        webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__.browser.tabs.create({
+            url: res.url,
+        });
+    };
+    const student_name = document.createElement('u');
+    student_name.innerHTML = res.name;
+    student_name.style.fontWeight = 'bold';
+    box.appendChild(student_name);
+    const prak_name = document.createElement('p');
+    prak_name.innerHTML = res.prak_name;
+    box.appendChild(prak_name);
+    result.appendChild(box);
 }
 
 
@@ -17484,7 +17711,9 @@ class SheetsAPI {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "parseSheetIndex": () => (/* binding */ parseSheetIndex),
-/* harmony export */   "convertColumnToLetter": () => (/* binding */ convertColumnToLetter)
+/* harmony export */   "convertColumnToLetter": () => (/* binding */ convertColumnToLetter),
+/* harmony export */   "getColumn": () => (/* binding */ getColumn),
+/* harmony export */   "getURL": () => (/* binding */ getURL)
 /* harmony export */ });
 function parseSheetIndex(sheetIndex) {
     return sheetIndex === '' ? 2 : parseInt(sheetIndex);
@@ -17497,6 +17726,14 @@ function convertColumnToLetter(number) {
             String.fromCharCode(65 + (number % 26))
         : '';
     return result;
+}
+function getColumn(content, modul) {
+    const sliceIndex = content.indexOf(modul);
+    const sliced = content.slice(0, sliceIndex);
+    return (sliced.match(/: /g) || []).length;
+}
+function getURL(sheetID, gid, column, row) {
+    return `https://docs.google.com/spreadsheets/d/${sheetID}/edit#gid=${gid}&range=${column}${row}`;
 }
 
 

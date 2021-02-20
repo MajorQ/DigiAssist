@@ -1,5 +1,3 @@
-import { Result } from './classes/result';
-
 export function parseSheetIndex(sheetIndex: string): number {
 	return sheetIndex === '' ? 2 : parseInt(sheetIndex);
 }
@@ -21,6 +19,11 @@ export function getColumn(content: string, modul: string): number {
 	return (sliced.match(/: /g) || []).length;
 }
 
-export function getURL(res: Result): string {
-	return `https://docs.google.com/spreadsheets/d/${res.praktikum.sheetID}/edit#gid=${res.praktikum.gid}&range=${res.column}${res.row}`;
+export function getURL(
+	sheetID: string,
+	gid: string,
+	column: number,
+	row: number
+): string {
+	return `https://docs.google.com/spreadsheets/d/${sheetID}/edit#gid=${gid}&range=${column}${row}`;
 }

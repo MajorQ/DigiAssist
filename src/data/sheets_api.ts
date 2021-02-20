@@ -6,10 +6,9 @@ import {
 } from '../classes/errors';
 import {
 	Praktikum,
-	PraktikumFailure,
-	PraktikumSuccess,
+	praktikumFailure,
+	praktikumSuccess,
 } from '../classes/praktikum';
-import * as E from '../lib/either';
 
 export interface SheetsAPI {
 	fetchSheet(sheet_id: string, sheet_index: number): Promise<object[]>;
@@ -21,7 +20,6 @@ export interface SheetsAPI {
 	): Promise<Praktikum>;
 }
 
-// TODOMAYBE: refactor with TaskEither
 export class FetchSheetsAPI implements SheetsAPI {
 	async fetchSheet(sheetID: string, sheetIndex: number): Promise<object[]> {
 		const url = `https://spreadsheets.google.com/feeds/list/${sheetID}/${sheetIndex}/public/values?alt=json`;
@@ -54,14 +52,7 @@ export class FetchSheetsAPI implements SheetsAPI {
 		sheetIndex: number
 	): Promise<Praktikum> {
 		return this.fetchSheet(sheetID, sheetIndex)
-			.then((data) =>
-				E.right<PraktikumSuccess>({
-					name,
-					sheetID,
-					gid,
-					data,
-				})
-			)
-			.catch((error: Error) => E.left<PraktikumFailure>({ name, error }));
+			.then((data) => praktikumSuccess(name, sheetID, gid, data))
+			.catch((error: Error) => praktikumFailure(name, error));
 	}
 }
