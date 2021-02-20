@@ -1,5 +1,3 @@
-// TODO: maybe refactor with Either in the future so it can be more reusable
-
 import { Either } from "../lib/either";
 
 export interface PraktikumSuccess {

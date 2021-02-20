@@ -3,6 +3,6 @@ import { PraktikumSuccess } from './praktikum';
 export interface Result {
 	name: string;
 	praktikum: PraktikumSuccess;
-	column: string;
+	column: number;
 	row: number;
 }

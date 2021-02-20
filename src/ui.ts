@@ -21,7 +21,14 @@ export function toggleLoading(state: State) {
 	}
 }
 
-export function createBox(res: Result) {
+export function showError(message: string) {
+	const p = document.createElement('p');
+	p.innerHTML = message;
+	p.style.color = 'red';
+	result.appendChild(p);
+}
+
+export function createResultBox(res: Result) {
 	const box = document.createElement('div');
 	box.style.border = 'medium solid #000000';
 	box.style.padding = '5px';

@@ -21,7 +21,7 @@ export interface SheetsAPI {
 	): Promise<Praktikum>;
 }
 
-// TODO: refactor with TaskEither
+// TODOMAYBE: refactor with TaskEither
 export class FetchSheetsAPI implements SheetsAPI {
 	async fetchSheet(sheetID: string, sheetIndex: number): Promise<object[]> {
 		const url = `https://spreadsheets.google.com/feeds/list/${sheetID}/${sheetIndex}/public/values?alt=json`;

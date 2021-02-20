@@ -2,26 +2,48 @@ import { DataStore } from './data_store';
 import { SheetsAPI } from './sheets_api';
 import { isEmpty } from 'lodash';
 
-import { parseSheetIndex } from '../utils';
+import { getColumn, parseSheetIndex } from '../utils';
 import {
 	Praktikum,
 	PraktikumFailure,
 	PraktikumSuccess,
 } from '../classes/praktikum';
 import * as E from '../lib/either';
+import { Result } from '../classes/result';
 
 export class Repository {
-	constructor(
-		private dataStore: DataStore,
-		private sheetsAPI: SheetsAPI,
-		private masterSheetId: string
-	) {}
+	constructor(private dataStore: DataStore, private sheetsAPI: SheetsAPI) {}
 
-	async getPraktikumData(): Promise<E.Either<PraktikumFailure, Praktikum[]>> {
+	searchPraktikan(
+		inputNPM: string,
+		praktikumList: Praktikum[],
+		modul: string
+	): Result {
+		for (let praktikum of praktikumList) {
+			if (E.isRight(praktikum)) {
+				const data = praktikum.right.data;
+				const index = data.findIndex(
+					(praktikan) => praktikan['gsx$npm']['$t'] === inputNPM
+				);
+				if (index !== -1) {
+					return {
+						name: data[index]['gsx$nama']['$t'],
+						row: index + 2,
+						column: getColumn(data[index]['content']['$t'], modul),
+						praktikum: praktikum.right,
+					};
+				}
+			}
+		}
+	}
+
+	async getPraktikumData(
+		masterSheetID: string
+	): Promise<E.Either<PraktikumFailure, Praktikum[]>> {
 		const cachedData = await this.dataStore.fetch();
 
 		if (isEmpty(cachedData)) {
-			const data = await this.fetchSheets(this.masterSheetId);
+			const data = await this.fetchSheets(masterSheetID);
 
 			if (E.isRight(data)) {
 				this.dataStore.store(data.right);
@@ -30,8 +52,8 @@ export class Repository {
 			return data;
 		}
 
-		if (Date.now() - cachedData.cacheTime > 3600 * 1000) {
-			const data = await this.fetchSheets(this.masterSheetId);
+		if (Date.now() - cachedData.time > 3600 * 1000) {
+			const data = await this.fetchSheets(masterSheetID);
 
 			if (E.isRight(data)) {
 				this.dataStore.store(data.right);
@@ -40,13 +62,13 @@ export class Repository {
 			return data;
 		}
 
-		return E.right(cachedData as Praktikum[]);
+		return E.right(cachedData.praktikum);
 	}
 
-	private async fetchSheets(
-		masterSheetId: string
+	async fetchSheets(
+		masterSheetID: string
 	): Promise<E.Either<PraktikumFailure, Praktikum[]>> {
-		const result = await this.fetchMasterSheet(masterSheetId);
+		const result = await this.fetchMasterSheet(masterSheetID);
 
 		if (E.isRight(result)) {
 			return E.right(await this.fetchOtherSheets(result.right));
