@@ -1,3 +1,5 @@
+import { Result } from "./classes/result";
+
 export function parseSheetIndex(sheetIndex: string): number {
 	return sheetIndex === '' ? 2 : parseInt(sheetIndex);
 }
@@ -11,4 +13,8 @@ export function convertColumnToLetter(number: number): string {
 			  String.fromCharCode(65 + (number % 26))
 			: '';
 	return result;
+}
+
+export function getURL(res: Result): string {
+	return `https://docs.google.com/spreadsheets/d/${res.praktikum.sheetID}/edit#gid=${res.praktikum.gid}&range=${res.column}${res.row}`;
 }
