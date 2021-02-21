@@ -17610,18 +17610,26 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
+//TODO: for some reason using 2 keys at once doesn't work
 class BrowserDataStore {
     fetch() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_1__.browser.storage.local.get(['praktikum, time'])
-                .then((data) => (0,lodash__WEBPACK_IMPORTED_MODULE_0__.isEmpty)(data) ? (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_3__.cacheEmpty)() : (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_3__.cacheSuccess)(data.praktikum, data.time))
+            const cachePromise = webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_1__.browser.storage.local.get('cache');
+            const timePromise = webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_1__.browser.storage.local.get('time');
+            return Promise.all([cachePromise, timePromise])
+                .then((values) => {
+                if ((0,lodash__WEBPACK_IMPORTED_MODULE_0__.isEmpty)(values[0] || (0,lodash__WEBPACK_IMPORTED_MODULE_0__.isEmpty)(values[1]))) {
+                    return (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_3__.cacheEmpty)();
+                }
+                return (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_3__.cacheSuccess)(values[0].cache, values[1].time);
+            })
                 .catch(() => (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_3__.cacheFailure)(new _classes_errors__WEBPACK_IMPORTED_MODULE_2__.CacheError()));
         });
     }
     store(data) {
         return __awaiter(this, void 0, void 0, function* () {
             return webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_1__.browser.storage.local.set({
-                praktikum: data,
+                cache: data,
                 time: Date.now(),
             });
         });
@@ -17662,6 +17670,7 @@ class Repository {
         this.dataStore = dataStore;
         this.sheetsAPI = sheetsAPI;
     }
+    // TODO: this may also fail
     searchPraktikan(inputNPM, praktikumList, modul) {
         let results;
         praktikumList.forEach((praktikum) => {

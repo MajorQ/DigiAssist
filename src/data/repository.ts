@@ -1,6 +1,5 @@
 import { DataStore } from './data_store';
 import { SheetsAPI } from './sheets_api';
-import { isEmpty, isUndefined } from 'lodash';
 
 import { getColumn, getURL, parseSheetIndex } from '../utils';
 import {
@@ -12,11 +11,11 @@ import {
 } from '../classes/praktikum';
 import { Result } from '../classes/result';
 import { matchI, matchPI } from 'ts-adt';
-import { success } from '../../test/fixtures/responses';
 
 export class Repository {
 	constructor(private dataStore: DataStore, private sheetsAPI: SheetsAPI) {}
 
+	// TODO: this may also fail
 	searchPraktikan(
 		inputNPM: string,
 		praktikumList: PraktikumSuccess[],
@@ -46,7 +45,6 @@ export class Repository {
 
 	async getPraktikumData(masterSheetID: string): Promise<PraktikumList> {
 		const cachedData = await this.dataStore.fetch();
-
 		return matchPI(cachedData)(
 			{
 				success: ({ value }) => {
@@ -55,9 +53,8 @@ export class Repository {
 					}
 					return praktikumListSuccess(value.praktikumList);
 				},
-			},
-			() => {
-				return this.fetchAndStoreSheets(masterSheetID);
+			}, () => {
+				return this.fetchAndStoreSheets(masterSheetID)
 			}
 		);
 	}

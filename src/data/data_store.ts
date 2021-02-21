@@ -14,19 +14,35 @@ export interface DataStore {
 	store(data: Praktikum[]): void;
 }
 
+//TODO: for some reason using 2 keys at once doesn't work
 export class BrowserDataStore implements DataStore {
 	async fetch(): Promise<CachePraktikum> {
-		return await browser.storage.local
-			.get(['praktikum, time'])
-			.then((data: {praktikum: Praktikum[], time: number}) =>
-				isEmpty(data) ? cacheEmpty() : cacheSuccess(data.praktikum, data.time)
+		const cachePromise = browser.storage.local.get('cache');
+		const timePromise = browser.storage.local.get('time');
+		return Promise.all([cachePromise, timePromise])
+			.then(
+				(
+					values: [
+						{
+							cache: Praktikum[];
+						},
+						{
+							time: number;
+						}
+					]
+				) => {
+					if (isEmpty(values[0] || isEmpty(values[1]))) {
+						return cacheEmpty();
+					}
+					return cacheSuccess(values[0].cache, values[1].time);
+				}
 			)
 			.catch(() => cacheFailure(new CacheError()));
 	}
 
 	async store(data: Praktikum[]) {
 		return browser.storage.local.set({
-			praktikum: data,
+			cache: data,
 			time: Date.now(),
 		});
 	}
