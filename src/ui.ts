@@ -1,10 +1,9 @@
 import { browser } from 'webextension-polyfill-ts';
 import { Result } from './classes/result';
-import { getURL } from './utils';
 
 const result = document.getElementById('result');
-const loading = document.getElementById('loading');
-const body = document.getElementById('body');
+const loading = document.getElementById('popup_loading');
+const body = document.getElementById('popup_body');
 
 export enum State {
 	IDLE = 'IDLE',

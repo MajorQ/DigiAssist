@@ -17165,6 +17165,189 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 /***/ }),
 
+/***/ "./node_modules/ts-adt/ADT.js":
+/*!************************************!*\
+  !*** ./node_modules/ts-adt/ADT.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.matchPI = exports.matchI = exports.matchP = exports.match = void 0;
+var MakeADT_1 = __webpack_require__(/*! ./MakeADT */ "./node_modules/ts-adt/MakeADT.js");
+/**
+ * Pattern matching for a sum type defined with ADT, with
+ * discriminant field "_type"
+ *
+ * ```ts
+ * declare const foo: Option<string>
+ *
+ * pipe(
+ *   foo,
+ *   match({
+ *     none: () => 'none',
+ *     some: ({value}) => 'some'
+ *   })
+ * )
+ * ```
+ */
+exports.match = (_a = MakeADT_1.makeMatchers("_type"), _a[0]), 
+/**
+ * Partial pattern matching for a sum type defined with ADT
+ *
+ * ```ts
+ * declare const foo: Option<string>
+ *
+ * pipe(
+ *   foo,
+ *   matchP({
+ *     some: ({value}) => 'some'
+ *   }, (_option) => 'none')
+ * )
+ * ```
+ */
+exports.matchP = _a[1], 
+/**
+ * Inverted version of match, useful for better inference in some circumstances
+ *
+ * ```ts
+ * declare const foo: Option<string>
+ *
+ * matchI(foo)({
+ *   none: () => 'none',
+ *   some: ({value}) => 'some'
+ * })
+ * ```
+ */
+exports.matchI = _a[2], 
+/**
+ * Inverted version of matchP, useful for better inference in some circumstances
+ *
+ * ```ts
+ * declare const foo: Option<string>
+ *
+ * matchPI(foo)({
+ *   some: ({value}) => 'some'
+ * }, (_option) => 'none')
+ * ```
+ */
+exports.matchPI = _a[3];
+//# sourceMappingURL=ADT.js.map
+
+/***/ }),
+
+/***/ "./node_modules/ts-adt/MakeADT.js":
+/*!****************************************!*\
+  !*** ./node_modules/ts-adt/MakeADT.js ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.makeMatchers = exports.makeMatchPI = exports.makeMatchI = exports.makeMatchP = exports.makeMatch = void 0;
+/**
+ * Pattern matching for a sum type defined with ADT
+ *
+ * ```ts
+ * declare const foo: Option<string>
+ *
+ * pipe(
+ *   foo,
+ *   makeMatch("_tag")({
+ *     none: () => 'none',
+ *     some: ({value}) => 'some'
+ *   })
+ * )
+ * ```
+ */
+function makeMatch(d) {
+    return function (matchObj) { return function (v) { return matchObj[v[d]](v); }; };
+}
+exports.makeMatch = makeMatch;
+/**
+ * Partial pattern matching for a sum type defined with ADT
+ *
+ * ```ts
+ * declare const foo: Option<string>
+ *
+ * pipe(
+ *   foo,
+ *   makeMatchP("_tag")({
+ *     some: ({value}) => 'some'
+ *   }, (_option) => 'none')
+ * )
+ * ```
+ */
+function makeMatchP(d) {
+    return function (matchObj, otherwise) { return function (v) {
+        return matchObj[v[d]] != null ? matchObj[v[d]](v) : otherwise(v);
+    }; };
+}
+exports.makeMatchP = makeMatchP;
+/**
+ * Inverted version of match, useful for better inference in some circumstances
+ *
+ * ```ts
+ * declare const foo: Option<string>
+ *
+ * makeMatchI('_tag')(foo)({
+ *   none: () => 'none',
+ *   some: ({value}) => 'some'
+ * })
+ * ```
+ */
+function makeMatchI(d) {
+    return function (v) { return function (matchObj) { return matchObj[v[d]](v); }; };
+}
+exports.makeMatchI = makeMatchI;
+/**
+ * Inverted version of {@link makeMatchP}, useful for better inference in some circumstances
+ *
+ * ```ts
+ * declare const foo: Option<string>
+ *
+ * makeMatchPI("_tag")(foo)({
+ *   some: ({value}) => 'some'
+ * }, (_option) => 'none')
+ * ```
+ */
+function makeMatchPI(d) {
+    return function (v) { return function (matchObj, otherwise) {
+        return matchObj[v[d]] != null
+            ? matchObj[v[d]](v)
+            : otherwise(v);
+    }; };
+}
+exports.makeMatchPI = makeMatchPI;
+/**
+ * Generate match functions that switch on a specified discriminant field
+ *
+ * ```ts
+ * import * as O from "fp-ts/Option";
+ *
+ * const [match, matchP, matchI, matchPI] = makeMatchers("_tag");
+ *
+ * pipe(
+ *   O.fromNullable("value"),
+ *   match({
+ *     None: () => 0,
+ *     Some: (v) => v.value,
+ *   })
+ * );
+ * ```
+ *
+ * @param d the discriminant field to use
+ */
+exports.makeMatchers = function (d) {
+    return [makeMatch(d), makeMatchP(d), makeMatchI(d), makeMatchPI(d)];
+};
+//# sourceMappingURL=MakeADT.js.map
+
+/***/ }),
+
 /***/ "./node_modules/ts-custom-error/dist/custom-error.mjs":
 /*!************************************************************!*\
   !*** ./node_modules/ts-custom-error/dist/custom-error.mjs ***!
@@ -17328,6 +17511,76 @@ class CacheError extends ts_custom_error__WEBPACK_IMPORTED_MODULE_0__.CustomErro
 
 /***/ }),
 
+/***/ "./src/classes/praktikum.ts":
+/*!**********************************!*\
+  !*** ./src/classes/praktikum.ts ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "praktikumSuccess": () => (/* binding */ praktikumSuccess),
+/* harmony export */   "praktikumFailure": () => (/* binding */ praktikumFailure),
+/* harmony export */   "praktikumListFailure": () => (/* binding */ praktikumListFailure),
+/* harmony export */   "praktikumListSuccess": () => (/* binding */ praktikumListSuccess),
+/* harmony export */   "cacheFailure": () => (/* binding */ cacheFailure),
+/* harmony export */   "cacheSuccess": () => (/* binding */ cacheSuccess),
+/* harmony export */   "cacheEmpty": () => (/* binding */ cacheEmpty)
+/* harmony export */ });
+function praktikumSuccess(name, sheetID, gid, data) {
+    return {
+        _type: 'success',
+        value: {
+            name,
+            sheetID,
+            gid,
+            data,
+        },
+    };
+}
+function praktikumFailure(name, error) {
+    return {
+        _type: 'failure',
+        value: {
+            name,
+            error,
+        },
+    };
+}
+function praktikumListFailure(error) {
+    return {
+        _type: 'failure',
+        value: error,
+    };
+}
+function praktikumListSuccess(praktikumList) {
+    return {
+        _type: 'success',
+        value: praktikumList,
+    };
+}
+function cacheFailure(error) {
+    return {
+        _type: 'failure',
+        value: error,
+    };
+}
+function cacheSuccess(praktikumList, time) {
+    return {
+        _type: 'success',
+        value: { praktikumList, time },
+    };
+}
+function cacheEmpty() {
+    return {
+        _type: 'empty',
+    };
+}
+
+
+/***/ }),
+
 /***/ "./src/data/data_store.ts":
 /*!********************************!*\
   !*** ./src/data/data_store.ts ***!
@@ -17339,8 +17592,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "BrowserDataStore": () => (/* binding */ BrowserDataStore)
 /* harmony export */ });
-/* harmony import */ var webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! webextension-polyfill-ts */ "./node_modules/webextension-polyfill-ts/lib/index.js");
-/* harmony import */ var _lib_either__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../lib/either */ "./src/lib/either.ts");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! webextension-polyfill-ts */ "./node_modules/webextension-polyfill-ts/lib/index.js");
+/* harmony import */ var _classes_errors__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../classes/errors */ "./src/classes/errors.ts");
+/* harmony import */ var _classes_praktikum__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../classes/praktikum */ "./src/classes/praktikum.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17352,17 +17608,19 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 };
 
 
-// TODO: this function may fail, should return either 
+
+
 class BrowserDataStore {
     fetch() {
         return __awaiter(this, void 0, void 0, function* () {
-            const data = yield webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__.browser.storage.local.get(['praktikum, time']);
-            return (0,_lib_either__WEBPACK_IMPORTED_MODULE_1__.right)({ praktikum: data.praktikum, time: data.time });
+            return yield webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_1__.browser.storage.local.get(['praktikum, time'])
+                .then((data) => (0,lodash__WEBPACK_IMPORTED_MODULE_0__.isEmpty)(data) ? (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_3__.cacheEmpty)() : (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_3__.cacheSuccess)(data.praktikum, data.time))
+                .catch(() => (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_3__.cacheFailure)(new _classes_errors__WEBPACK_IMPORTED_MODULE_2__.CacheError()));
         });
     }
     store(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            return webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__.browser.storage.local.set({
+            return webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_1__.browser.storage.local.set({
                 praktikum: data,
                 time: Date.now(),
             });
@@ -17384,10 +17642,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Repository": () => (/* binding */ Repository)
 /* harmony export */ });
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/utils.ts");
-/* harmony import */ var _lib_either__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lib/either */ "./src/lib/either.ts");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/utils.ts");
+/* harmony import */ var _classes_praktikum__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../classes/praktikum */ "./src/classes/praktikum.ts");
+/* harmony import */ var ts_adt__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ts-adt */ "./node_modules/ts-adt/ADT.js");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17414,7 +17671,7 @@ class Repository {
                 results.push({
                     name: data[index]['gsx$nama']['$t'],
                     prak_name: praktikum.name,
-                    url: (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getURL)(praktikum.sheetID, praktikum.gid, (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getColumn)(data[index]['content']['$t'], modul), index + 2),
+                    url: (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getURL)(praktikum.sheetID, praktikum.gid, (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getColumn)(data[index]['content']['$t'], modul), index + 2),
                 });
             }
         });
@@ -17423,45 +17680,43 @@ class Repository {
     getPraktikumData(masterSheetID) {
         return __awaiter(this, void 0, void 0, function* () {
             const cachedData = yield this.dataStore.fetch();
-            if ((0,lodash__WEBPACK_IMPORTED_MODULE_0__.isEmpty)(cachedData)) {
-                const data = yield this.fetchSheets(masterSheetID);
-                if (_lib_either__WEBPACK_IMPORTED_MODULE_2__.isRight(data)) {
-                    this.dataStore.store(data.right);
-                }
-                return data;
-            }
-            if (Date.now() - cachedData.time > 3600 * 1000) {
-                const fetchData = yield this.fetchSheets(masterSheetID);
-                if (_lib_either__WEBPACK_IMPORTED_MODULE_2__.isRight(fetchData)) {
-                    this.dataStore.store(fetchData.right);
-                }
-                return fetchData;
-            }
-            return _lib_either__WEBPACK_IMPORTED_MODULE_2__.right(cachedData.praktikum);
+            return (0,ts_adt__WEBPACK_IMPORTED_MODULE_2__.matchPI)(cachedData)({
+                success: ({ value }) => {
+                    if (Date.now() - value.time > 3600 * 1000) {
+                        return this.fetchAndStoreSheets(masterSheetID);
+                    }
+                    return (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_1__.praktikumListSuccess)(value.praktikumList);
+                },
+            }, () => {
+                return this.fetchAndStoreSheets(masterSheetID);
+            });
         });
     }
-    fetchSheets(masterSheetID) {
+    fetchAndStoreSheets(masterSheetID) {
         return __awaiter(this, void 0, void 0, function* () {
             const masterSheetData = yield this.fetchMasterSheet(masterSheetID);
-            if (_lib_either__WEBPACK_IMPORTED_MODULE_2__.isRight(masterSheetData)) {
-                return _lib_either__WEBPACK_IMPORTED_MODULE_2__.right(yield this.fetchOtherSheets(masterSheetData.right));
-            }
-            else {
-                return _lib_either__WEBPACK_IMPORTED_MODULE_2__.left(masterSheetData.left);
-            }
+            // If master sheet failed, then return the failure
+            // else, return data as empty or success
+            return (0,ts_adt__WEBPACK_IMPORTED_MODULE_2__.matchI)(masterSheetData)({
+                failure: ({ value }) => {
+                    return (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_1__.praktikumListFailure)(value.error);
+                },
+                success: ({ value }) => __awaiter(this, void 0, void 0, function* () {
+                    const fetchData = yield this.fetchOtherSheets(value.data);
+                    this.dataStore.store(fetchData);
+                    return (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_1__.praktikumListSuccess)(fetchData);
+                }),
+            });
         });
     }
     fetchMasterSheet(masterSheetId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.sheetsAPI.fetchSheetPraktikum('Master Sheet', masterSheetId, '0', 1);
-        });
+        return this.sheetsAPI.fetchSheetPraktikum('Master Sheet', masterSheetId, '0', 1);
     }
-    fetchOtherSheets(praktikum) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return Promise.all(praktikum.data.map((sheet) => __awaiter(this, void 0, void 0, function* () {
-                return this.sheetsAPI.fetchSheetPraktikum(sheet['gsx$namapraktikum']['$t'], sheet['gsx$sheetid']['$t'], sheet['gsx$gid']['$t'], (0,_utils__WEBPACK_IMPORTED_MODULE_1__.parseSheetIndex)(sheet['gsx$namapraktikum']['$t']));
-            })));
-        });
+    // TODO: this may fail
+    fetchOtherSheets(praktikumList) {
+        return Promise.all(praktikumList.map((sheet) => {
+            return this.sheetsAPI.fetchSheetPraktikum(sheet['gsx$namapraktikum']['$t'], sheet['gsx$sheetid']['$t'], sheet['gsx$gid']['$t'], (0,_utils__WEBPACK_IMPORTED_MODULE_0__.parseSheetIndex)(sheet['gsx$sheetindex']['$t']));
+        }));
     }
 }
 
@@ -17482,7 +17737,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _classes_errors__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../classes/errors */ "./src/classes/errors.ts");
-/* harmony import */ var _lib_either__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../lib/either */ "./src/lib/either.ts");
+/* harmony import */ var _classes_praktikum__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../classes/praktikum */ "./src/classes/praktikum.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17519,43 +17774,11 @@ class FetchSheetsAPI {
     fetchSheetPraktikum(name, sheetID, gid, sheetIndex) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.fetchSheet(sheetID, sheetIndex)
-                .then((data) => _lib_either__WEBPACK_IMPORTED_MODULE_2__.right({
-                name,
-                sheetID,
-                gid,
-                data,
-            }))
-                .catch((error) => _lib_either__WEBPACK_IMPORTED_MODULE_2__.left({ name, error }));
+                .then((data) => (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_2__.praktikumSuccess)(name, sheetID, gid, data))
+                .catch((error) => (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_2__.praktikumFailure)(name, error));
         });
     }
 }
-
-
-/***/ }),
-
-/***/ "./src/lib/either.ts":
-/*!***************************!*\
-  !*** ./src/lib/either.ts ***!
-  \***************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "left": () => (/* binding */ left),
-/* harmony export */   "right": () => (/* binding */ right),
-/* harmony export */   "isLeft": () => (/* binding */ isLeft),
-/* harmony export */   "isRight": () => (/* binding */ isRight),
-/* harmony export */   "fold": () => (/* binding */ fold)
-/* harmony export */ });
-const left = (left) => ({ type: 'left', left });
-const right = (right) => ({
-    type: 'right',
-    right,
-});
-const isLeft = (either) => either.type === 'left';
-const isRight = (either) => either.type === 'right';
-const fold = (either, onLeft, onRight) => (isRight(either) ? onRight(either.right) : onLeft(either.left));
 
 
 /***/ }),
@@ -17574,7 +17797,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ui__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ui */ "./src/ui.ts");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! webextension-polyfill-ts */ "./node_modules/webextension-polyfill-ts/lib/index.js");
+/* harmony import */ var ts_adt__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ts-adt */ "./node_modules/ts-adt/ADT.js");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -17597,42 +17820,45 @@ const refreshButton = document.getElementById('refresh_button');
 //
 // dummy Sheet
 // '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ'
-const masterSheetID = '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ';
+const masterSheetID = '1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg';
 const repository = new _data_repository__WEBPACK_IMPORTED_MODULE_1__.Repository(new _data_data_store__WEBPACK_IMPORTED_MODULE_0__.BrowserDataStore(), new _data_sheets_api__WEBPACK_IMPORTED_MODULE_2__.FetchSheetsAPI());
-let praktikumList;
+let praktikumList = [];
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
-    // toggleLoading(State.BUSY);
-    // const masterSheetResult = await repository.getPraktikumData(masterSheetID);
-    // // UGLY
-    // if (isRight(masterSheetResult)) {
-    // 	masterSheetResult.right.forEach((sheet) => {
-    // 		if (isRight(sheet)) {
-    // 		} else {
-    // 			showError(`Could not access ${sheet.left.name} ${sheet.left.error}`);
-    // 		}
-    // 	});
-    // } else {
-    // 	showError(
-    // 		`Could not access ${masterSheetResult.left.name} ${masterSheetResult.left.error}`
-    // 	);
-    // }
-    // toggleLoading(State.IDLE);
-    webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_5__.browser.storage.local.get('unknownKey').then(console.log);
+    _ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading(_ui__WEBPACK_IMPORTED_MODULE_3__.State.BUSY);
+    const masterSheetResult = yield repository.getPraktikumData(masterSheetID);
+    (0,ts_adt__WEBPACK_IMPORTED_MODULE_5__.matchI)(masterSheetResult)({
+        failure: ({ value: masterSheetValue }) => {
+            _ui__WEBPACK_IMPORTED_MODULE_3__.showError(`Could not access Master Sheet ${masterSheetValue.message}`);
+        },
+        success: ({ value: masterSheetValue }) => {
+            masterSheetValue.forEach((child) => {
+                (0,ts_adt__WEBPACK_IMPORTED_MODULE_5__.matchI)(child)({
+                    failure: ({ value: childValue }) => {
+                        _ui__WEBPACK_IMPORTED_MODULE_3__.showError(`Could not access ${childValue.name} ${childValue.error.message}`);
+                    },
+                    success: ({ value: childValue }) => {
+                        praktikumList.push(childValue);
+                    },
+                });
+            });
+        },
+    });
+    _ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading(_ui__WEBPACK_IMPORTED_MODULE_3__.State.IDLE);
 }));
 searchButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
     const NPMField = document.getElementById('npm_text_field').value;
     const modul = document.getElementById('praktikum_dropdown').value;
     const results = repository.searchPraktikan(NPMField, praktikumList, modul);
     if ((0,lodash__WEBPACK_IMPORTED_MODULE_4__.isEmpty)(results)) {
-        results.forEach((result) => (0,_ui__WEBPACK_IMPORTED_MODULE_3__.createResultBox)(result));
+        results.forEach((result) => _ui__WEBPACK_IMPORTED_MODULE_3__.createResultBox(result));
     }
     else {
-        (0,_ui__WEBPACK_IMPORTED_MODULE_3__.showError)('NPM was not found!');
+        _ui__WEBPACK_IMPORTED_MODULE_3__.showError('NPM was not found!');
     }
 }));
 refreshButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
-    (0,_ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading)(_ui__WEBPACK_IMPORTED_MODULE_3__.State.BUSY);
-    (0,_ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading)(_ui__WEBPACK_IMPORTED_MODULE_3__.State.IDLE);
+    _ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading(_ui__WEBPACK_IMPORTED_MODULE_3__.State.BUSY);
+    _ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading(_ui__WEBPACK_IMPORTED_MODULE_3__.State.IDLE);
 }));
 
 
@@ -17655,8 +17881,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var webextension_polyfill_ts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! webextension-polyfill-ts */ "./node_modules/webextension-polyfill-ts/lib/index.js");
 
 const result = document.getElementById('result');
-const loading = document.getElementById('loading');
-const body = document.getElementById('body');
+const loading = document.getElementById('popup_loading');
+const body = document.getElementById('popup_body');
 var State;
 (function (State) {
     State["IDLE"] = "IDLE";

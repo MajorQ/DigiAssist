@@ -1,12 +1,10 @@
 import { BrowserDataStore } from './data/data_store';
 import { Repository } from './data/repository';
 import { FetchSheetsAPI } from './data/sheets_api';
-import { createResultBox, showError, State, toggleLoading } from './ui';
-import {
-	Praktikum,
-} from './classes/praktikum';
+import * as UI from './ui';
+import { PraktikumSuccess } from './classes/praktikum';
 import { isEmpty } from 'lodash';
-import { browser } from 'webextension-polyfill-ts';
+import { matchI } from 'ts-adt';
 
 const searchButton = document.getElementById('search_button');
 const refreshButton = document.getElementById('refresh_button');
@@ -17,37 +15,38 @@ const refreshButton = document.getElementById('refresh_button');
 // dummy Sheet
 // '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ'
 
-const masterSheetID = '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ';
+const masterSheetID = '1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg';
 
 const repository = new Repository(new BrowserDataStore(), new FetchSheetsAPI());
 
-let praktikumList: [];
+let praktikumList: PraktikumSuccess[] = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
-	// toggleLoading(State.BUSY);
+	UI.toggleLoading(UI.State.BUSY);
 
-	// const masterSheetResult = await repository.getPraktikumData(masterSheetID);
+	const masterSheetResult = await repository.getPraktikumData(masterSheetID);
 
-	// // UGLY
-	// if (isRight(masterSheetResult)) {
-	// 	masterSheetResult.right.forEach((sheet) => {
-	// 		if (isRight(sheet)) {
-	// 		} else {
-	// 			showError(`Could not access ${sheet.left.name} ${sheet.left.error}`);
-	// 		}
-	// 	});
-	// } else {
-	// 	showError(
-	// 		`Could not access ${masterSheetResult.left.name} ${masterSheetResult.left.error}`
-	// 	);
-	// }
+	matchI(masterSheetResult)({
+		failure: ({ value: masterSheetValue }) => {
+			UI.showError(`Could not access Master Sheet ${masterSheetValue.message}`);
+		},
+		success: ({ value: masterSheetValue }) => {
+			masterSheetValue.forEach((child) => {
+				matchI(child)({
+					failure: ({ value: childValue }) => {
+						UI.showError(
+							`Could not access ${childValue.name} ${childValue.error.message}`
+						);
+					},
+					success: ({ value: childValue }) => {
+						praktikumList.push(childValue);
+					},
+				});
+			});
+		},
+	});
 
-	// toggleLoading(State.IDLE);
-
-	browser.storage.local.get(['unknownKey', 'unknownKey2']).then(console.log)
-
-	// const a = new FetchSheetsAPI()
-	// a.fetchSheet(masterSheetID, 3);
+	UI.toggleLoading(UI.State.IDLE);
 });
 
 searchButton.addEventListener('click', async () => {
@@ -60,13 +59,13 @@ searchButton.addEventListener('click', async () => {
 
 	const results = repository.searchPraktikan(NPMField, praktikumList, modul);
 	if (isEmpty(results)) {
-		results.forEach((result) => createResultBox(result));
+		results.forEach((result) => UI.createResultBox(result));
 	} else {
-		showError('NPM was not found!');
+		UI.showError('NPM was not found!');
 	}
 });
 
 refreshButton.addEventListener('click', async () => {
-	toggleLoading(State.BUSY);
-	toggleLoading(State.IDLE);
+	UI.toggleLoading(UI.State.BUSY);
+	UI.toggleLoading(UI.State.IDLE);
 });

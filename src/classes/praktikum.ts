@@ -45,7 +45,6 @@ export function praktikumFailure(name: string, error: Error): Praktikum {
 }
 
 export type PraktikumList = ADT<{
-	empty: {};
 	failure: { value: Error };
 	success: { value: Praktikum[] };
 }>;
@@ -63,12 +62,6 @@ export function praktikumListSuccess(
 	return {
 		_type: 'success',
 		value: praktikumList,
-	};
-}
-
-export function praktikumListEmpty(): PraktikumList {
-	return {
-		_type: 'empty',
 	};
 }
 

@@ -9,10 +9,10 @@ import {
 	PraktikumList,
 	praktikumListFailure,
 	praktikumListSuccess,
-	praktikumListEmpty,
 } from '../classes/praktikum';
 import { Result } from '../classes/result';
-import { match, matchI } from 'ts-adt';
+import { matchI, matchPI } from 'ts-adt';
+import { success } from '../../test/fixtures/responses';
 
 export class Repository {
 	constructor(private dataStore: DataStore, private sheetsAPI: SheetsAPI) {}
@@ -44,38 +44,25 @@ export class Repository {
 		return results;
 	}
 
-	async getPraktikumData(masterSheetID: string): Promise<any> {
+	async getPraktikumData(masterSheetID: string): Promise<PraktikumList> {
 		const cachedData = await this.dataStore.fetch();
 
-		// If cacheData is empty, then fetch again and return
-		matchI(cachedData)({
-			empty: async () => {
-				const fetchData = await this.fetchSheets(masterSheetID);
-				return matchI(fetchData)({
-					empty: () => {
-						return praktikumListEmpty();
-					},
-					failure: ({ value }) => {
-						return praktikumListFailure(value);
-					},
-					success: ({ value }) => {
-						return praktikumListSuccess(value);
-					},
-				});
+		return matchPI(cachedData)(
+			{
+				success: ({ value }) => {
+					if (Date.now() - value.time > 3600 * 1000) {
+						return this.fetchAndStoreSheets(masterSheetID);
+					}
+					return praktikumListSuccess(value.praktikumList);
+				},
 			},
-			failure: ({ value }) => {
-				return praktikumListFailure(value);
-			},
-			success: ({ value }) => {
-				if (Date.now() - value.time > 3600 * 1000) {
-					
-				}
-				return cachedData;
-			},
-		});
+			() => {
+				return this.fetchAndStoreSheets(masterSheetID);
+			}
+		);
 	}
 
-	async fetchSheets(masterSheetID: string): Promise<PraktikumList> {
+	async fetchAndStoreSheets(masterSheetID: string): Promise<PraktikumList> {
 		const masterSheetData = await this.fetchMasterSheet(masterSheetID);
 
 		// If master sheet failed, then return the failure
@@ -85,16 +72,14 @@ export class Repository {
 				return praktikumListFailure(value.error);
 			},
 			success: async ({ value }) => {
-				const data = await this.fetchOtherSheets(value);
-				if (isUndefined(data) || isEmpty(data)) {
-					return praktikumListEmpty();
-				}
-				return praktikumListSuccess(data);
+				const fetchData = await this.fetchOtherSheets(value.data);
+				this.dataStore.store(fetchData);
+				return praktikumListSuccess(fetchData);
 			},
 		});
 	}
 
-	private async fetchMasterSheet(masterSheetId: string): Promise<Praktikum> {
+	private fetchMasterSheet(masterSheetId: string): Promise<Praktikum> {
 		return this.sheetsAPI.fetchSheetPraktikum(
 			'Master Sheet',
 			masterSheetId,
@@ -103,16 +88,17 @@ export class Repository {
 		);
 	}
 
-	private async fetchOtherSheets(
-		praktikum: PraktikumSuccess
+	// TODO: this may fail
+	private fetchOtherSheets(
+		praktikumList: object[]
 	): Promise<Praktikum[]> {
 		return Promise.all<Praktikum>(
-			praktikum.data.map(async (sheet: object) => {
+			praktikumList.map((sheet: object) => {
 				return this.sheetsAPI.fetchSheetPraktikum(
 					sheet['gsx$namapraktikum']['$t'],
 					sheet['gsx$sheetid']['$t'],
 					sheet['gsx$gid']['$t'],
-					parseSheetIndex(sheet['gsx$namapraktikum']['$t'])
+					parseSheetIndex(sheet['gsx$sheetindex']['$t'])
 				);
 			})
 		);

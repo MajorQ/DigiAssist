@@ -1,58 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport">
-    <title>Popup</title>
-
-    <script src="./js/main.js" defer></script>
-    <link rel="stylesheet" href="./popup.css" />
-  </head>
-  <body>
-    <div class="loading" id="popup_loading" style="display: none"></div>
-    <div id="popup_body">
-      <div><h2>DigiAssist</h2></div>
-      <div>
-        <label for="npm_text_field">Cari NPM:</label>
-        <input
-          type="text"
-          id="npm_text_field"
-          name="NPM"
-          autofocus
-          autocomplete="off"
-        />
-      </div>
-      <div>
-        <label for="praktikum_dropdown">Pilih Praktikum:</label>
-        <select name="praktikum_dropdown" id="praktikum_dropdown">
-          <option value="">Semua praktikum</option>
-        </select>
-      </div>
-      <div>
-        <label for="modul_dropdown">Pilih Modul:</label>
-        <select name="modul_dropdown" id="modul_dropdown">
-          <option value="">--</option>
-          <option value="modul1">Modul 1</option>
-          <option value="modul2">Modul 2</option>
-          <option value="modul3">Modul 3</option>
-          <option value="modul4">Modul 4</option>
-          <option value="modul5">Modul 5</option>
-          <option value="modul6">Modul 6</option>
-          <option value="modul7">Modul 7</option>
-          <option value="modul8">Modul 8</option>
-          <option value="modul9">Modul 9</option>
-          <option value="modul10">Modul 10</option>
-        </select>
-      </div>
-      <div style="text-align: right">
-        <button id="search_button">Search</button>
-      </div>
-      <div id="result">
-      </div>
-      <div style="display: inline">
-        <p id="date"></p>
-        <button id="refresh_button">Refresh</button>
-      </div>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DigiAssist</title>
+  <script src="./main.js" defer></script>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="loading" id="popup_loading" style="display: none"></div>
+  <div id="popup_body">
+    <div><h2>DigiAssist</h2></div>
+    <div>
+      <label for="npm_text_field">Cari NPM:</label>
+      <input
+        type="text"
+        id="npm_text_field"
+        name="NPM"
+        autocomplete="off"
+        autofocus
+      />
     </div>
-  </body>
+    <div>
+      <label for="praktikum_dropdown">Pilih Praktikum:</label>
+      <select name="praktikum_dropdown" id="praktikum_dropdown">
+        <option value="">Semua praktikum</option>
+      </select>
+    </div>
+    <div>
+      <label for="modul_dropdown">Pilih Modul:</label>
+      <select name="modul_dropdown" id="modul_dropdown">
+        <option value="">--</option>
+        <option value="modul1">Modul 1</option>
+        <option value="modul2">Modul 2</option>
+        <option value="modul3">Modul 3</option>
+        <option value="modul4">Modul 4</option>
+        <option value="modul5">Modul 5</option>
+        <option value="modul6">Modul 6</option>
+        <option value="modul7">Modul 7</option>
+        <option value="modul8">Modul 8</option>
+        <option value="modul9">Modul 9</option>
+        <option value="modul10">Modul 10</option>
+      </select>
+    </div>
+    <div style="text-align: right">
+      <button id="search_button">Search</button>
+    </div>
+    <div id="result">
+    </div>
+    <div style="display: inline">
+      <p id="date"></p>
+      <button id="refresh_button">Refresh</button>
+    </div>
+  </div>
+</body>
 </html>
