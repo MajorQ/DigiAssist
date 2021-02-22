@@ -9,37 +9,30 @@ import { matchI } from 'ts-adt';
 const searchButton = document.getElementById('search_button');
 const refreshButton = document.getElementById('refresh_button');
 
-// actual masterSheet
-// '1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg'
-//
-// dummy Sheet
-// '1gy9XBOyANahh12NYR1vK9cHMYQrhRkdysh15BpqzWLQ'
-
-const masterSheetID = '1n9B0q-SOT8q7f_jaTGjYq7WrvGxsGKwpJ4ho8V6VAZg';
-
-const repository = new Repository(new BrowserDataStore(), new FetchSheetsAPI());
+const linkSheetID = '1INKbXKbih8q-JwNm74zjVThU7f75EpA4Pwh1niX6iQw';
+const repository = new Repository(new BrowserDataStore(), new FetchSheetsAPI(), );
 
 let praktikumList: PraktikumSuccess[] = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
 	UI.toggleLoading(UI.State.BUSY);
 
-	const masterSheetResult = await repository.getPraktikumData(masterSheetID);
+	const masterSheetResult = await repository.getPraktikumData(linkSheetID);
 
 	matchI(masterSheetResult)({
-		failure: ({ value: masterSheetValue }) => {
-			UI.showError(`Could not access Master Sheet ${masterSheetValue.message}`);
+		failure: ({ value: linkSheetValue }) => {
+			UI.showError(`Could not access Link Sheet ${linkSheetValue.message}`);
 		},
-		success: ({ value: masterSheetValue }) => {
-			masterSheetValue.forEach((child) => {
+		success: ({ value: linkSheetValue }) => {
+			linkSheetValue.forEach((child) => {
 				matchI(child)({
-					failure: ({ value: childValue }) => {
+					failure: ({ value: childSheetValue }) => {
 						UI.showError(
-							`Could not access ${childValue.name} ${childValue.error.message}`
+							`Could not access ${childSheetValue.name} ${childSheetValue.error.message}`
 						);
 					},
-					success: ({ value: childValue }) => {
-						praktikumList.push(childValue);
+					success: ({ value: childSheetValue }) => {
+						praktikumList.push(childSheetValue);
 					},
 				});
 			});

@@ -43,50 +43,51 @@ export class Repository {
 		return results;
 	}
 
-	async getPraktikumData(masterSheetID: string): Promise<PraktikumList> {
+	async getPraktikumData(linkSheetID: string): Promise<PraktikumList> {
 		const cachedData = await this.dataStore.fetch();
 		return matchPI(cachedData)(
 			{
 				success: ({ value }) => {
 					if (Date.now() - value.time > 3600 * 1000) {
-						return this.fetchAndStoreSheets(masterSheetID);
+						return this.fetchAndStoreSheets(linkSheetID);
 					}
 					return praktikumListSuccess(value.praktikumList);
 				},
 			}, () => {
-				return this.fetchAndStoreSheets(masterSheetID)
+				return this.fetchAndStoreSheets(linkSheetID)
 			}
 		);
 	}
 
-	async fetchAndStoreSheets(masterSheetID: string): Promise<PraktikumList> {
-		const masterSheetData = await this.fetchMasterSheet(masterSheetID);
+	async fetchAndStoreSheets(linkSheetID: string): Promise<PraktikumList> {
+		const masterSheetData = await this.fetchLinkSheet(linkSheetID);
 
-		// If master sheet failed, then return the failure
+		// If link sheet failed, then return the failure
 		// else, return data as empty or success
 		return matchI(masterSheetData)({
 			failure: ({ value }) => {
 				return praktikumListFailure(value.error);
 			},
 			success: async ({ value }) => {
-				const fetchData = await this.fetchOtherSheets(value.data);
+				const fetchData = await this.fetchSheetsInArray(value.data);
 				this.dataStore.store(fetchData);
 				return praktikumListSuccess(fetchData);
 			},
 		});
 	}
 
-	private fetchMasterSheet(masterSheetId: string): Promise<Praktikum> {
+	// the name and gid is never used, so it is left empty
+	private fetchLinkSheet(linkSheetID: string): Promise<Praktikum> {
 		return this.sheetsAPI.fetchSheetPraktikum(
-			'Master Sheet',
-			masterSheetId,
-			'0',
+			'',
+			linkSheetID,
+			'',
 			1
 		);
 	}
 
 	// TODO: this may fail
-	private fetchOtherSheets(
+	private fetchSheetsInArray(
 		praktikumList: object[]
 	): Promise<Praktikum[]> {
 		return Promise.all<Praktikum>(
