@@ -10,12 +10,42 @@ const searchButton = document.getElementById('search_button');
 const refreshButton = document.getElementById('refresh_button');
 
 const linkSheetID = '1INKbXKbih8q-JwNm74zjVThU7f75EpA4Pwh1niX6iQw';
-const repository = new Repository(new BrowserDataStore(), new FetchSheetsAPI(), );
+const repository = new Repository(new BrowserDataStore(), new FetchSheetsAPI());
 
 let praktikumList: PraktikumSuccess[] = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
 	UI.toggleLoading(UI.State.BUSY);
+	await refresh();
+	UI.toggleLoading(UI.State.IDLE);
+});
+
+searchButton.addEventListener('click', async () => {
+	const NPMField = (document.getElementById(
+		'npm_text_field'
+	) as HTMLInputElement).value;
+	const modul = (document.getElementById(
+		'praktikum_dropdown'
+	) as HTMLInputElement).value;
+
+	const results = repository.searchPraktikan(NPMField, praktikumList, modul);
+	if (isEmpty(results)) {
+		results.forEach((result) => UI.createResultBox(result));
+	} else {
+		UI.showError('NPM was not found!');
+	}
+});
+
+refreshButton.addEventListener('click', async () => {
+	UI.toggleLoading(UI.State.BUSY);
+	await refresh();
+	UI.toggleLoading(UI.State.IDLE);
+});
+
+async function refresh() {
+	UI.clearResults();
+
+	praktikumList = [];
 
 	const masterSheetResult = await repository.getPraktikumData(linkSheetID);
 
@@ -39,26 +69,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 		},
 	});
 
-	UI.toggleLoading(UI.State.IDLE);
-});
-
-searchButton.addEventListener('click', async () => {
-	const NPMField = (document.getElementById(
-		'npm_text_field'
-	) as HTMLInputElement).value;
-	const modul = (document.getElementById(
-		'praktikum_dropdown'
-	) as HTMLInputElement).value;
-
-	const results = repository.searchPraktikan(NPMField, praktikumList, modul);
-	if (isEmpty(results)) {
-		results.forEach((result) => UI.createResultBox(result));
-	} else {
-		UI.showError('NPM was not found!');
-	}
-});
-
-refreshButton.addEventListener('click', async () => {
-	UI.toggleLoading(UI.State.BUSY);
-	UI.toggleLoading(UI.State.IDLE);
-});
+	UI.createPraktikumDropdown(praktikumList);
+}

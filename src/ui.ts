@@ -1,9 +1,11 @@
 import { browser } from 'webextension-polyfill-ts';
+import { PraktikumSuccess } from './classes/praktikum';
 import { Result } from './classes/result';
 
 const result = document.getElementById('result');
 const loading = document.getElementById('popup_loading');
 const body = document.getElementById('popup_body');
+const praktikum_dropdown = document.getElementById('praktikum_dropdown');
 
 export enum State {
 	IDLE = 'IDLE',
@@ -48,4 +50,30 @@ export function createResultBox(res: Result) {
 	box.appendChild(prak_name);
 
 	result.appendChild(box);
+}
+
+export function clearResults() {
+	while(result.firstChild) result.removeChild(result.firstChild);
+}
+
+export function createPraktikumDropdown(list: PraktikumSuccess[]) {
+
+	// sort list of praktikum then
+	list.sort((a, b) => {
+		if (a.name < b.name) {
+			return -1;
+		}
+		if (a.name > b.name) {
+			return 1;
+		}
+		return 0;
+	});
+
+	// create the praktikum dropdown options
+	list.forEach((praktikum) => {
+		let option = document.createElement('option');
+		option.innerHTML = praktikum.name;
+		option.value = praktikum.name;
+		praktikum_dropdown.appendChild(option);
+	});
 }
