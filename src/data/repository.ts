@@ -1,98 +1,74 @@
 import { DataStore } from './data_store';
 import { SheetsAPI } from './sheets_api';
 
-import {
-	convertColumnToLetter,
-	getColumn,
-	getURL,
-	parseSheetIndex,
-} from '../utils';
+import { parseSheetIndex } from '../utils';
 import {
 	PraktikumADT,
 	Praktikum,
-	PraktikumListADT,
-	praktikumListFailure,
-	praktikumListSuccess,
+	LinkSheetADT,
+	linkSheetFailure,
+	linkSheetSuccess,
 } from '../classes/praktikum';
-import { Result } from '../classes/result';
 import { matchI, matchPI } from 'ts-adt';
 
 export class Repository {
 	constructor(private dataStore: DataStore, private sheetsAPI: SheetsAPI) {}
 
-	// TODO: this may also fail
-	searchPraktikan(
-		inputNPM: string,
-		praktikumList: Praktikum[],
-		modul: string
-	): Result[] {
-		let results: Result[] = [];
-		praktikumList.forEach((praktikum) => {
-			const data = praktikum.data;
-			const index = data.findIndex(
-				(praktikan) => praktikan['gsx$npm']['$t'] === inputNPM
-			);
-			if (index !== -1) {
-				results.push({
-					name: data[index]['gsx$nama']['$t'],
-					prak_name: praktikum.name,
-					url: getURL(
-						praktikum.sheetID,
-						praktikum.gid,
-						convertColumnToLetter(
-							getColumn(data[index]['content']['$t'], modul) + 1
-						),
-						index + 2
-					),
-				});
-			}
-		});
-		return results;
-	}
-
-	async getPraktikumData(linkSheetID: string): Promise<PraktikumListADT> {
+	// 1. Seach praktikum from cache
+	// 2. If cache is empty or failure then fetch the data
+	async getPraktikumData(linkSheetID: string): Promise<LinkSheetADT> {
 		const cachedData = await this.dataStore.fetch();
 		return matchPI(cachedData)(
 			{
-				success: ({ value }) => {
-					if (Date.now() - value.time > 3600 * 1000) {
-						return this.fetchAndStoreSheets(linkSheetID);
+				success: ({ value: cacheValue }) => {
+					if (Date.now() - cacheValue.time > 3600 * 1000) {
+						return this.fetchPraktikumData(linkSheetID);
 					}
-					return praktikumListSuccess(value.praktikumList);
+					return linkSheetSuccess(cacheValue.praktikumList);
 				},
 			},
 			() => {
-				return this.fetchAndStoreSheets(linkSheetID);
+				return this.fetchPraktikumData(linkSheetID);
 			}
 		);
 	}
 
-	async fetchAndStoreSheets(linkSheetID: string): Promise<PraktikumListADT> {
-		const masterSheetData = await this.fetchLinkSheet(linkSheetID);
-
-		// If link sheet failed, then return the failure
-		// else, return data as empty or success
-		return matchI(masterSheetData)({
-			failure: ({ value }) => {
-				return praktikumListFailure(value.error);
+	// 1. Fetches the link sheet
+	// 2. If link sheet fails then return the failure
+	// 3. On success then get sheets from that link sheet
+	async fetchPraktikumData(linkSheetID: string): Promise<LinkSheetADT> {
+		const linkSheetData = await this.fetchLinkSheet(linkSheetID);
+		return matchI(linkSheetData)({
+			failure: ({ value: linkSheetValue }) => {
+				return linkSheetFailure(linkSheetValue.error);
 			},
-			success: async ({ value }) => {
-				const fetchData = await this.fetchSheetsInArray(value.data);
-				this.dataStore.store(fetchData);
-				return praktikumListSuccess(fetchData);
+			success: async ({ value: linkSheetValue }) => {
+				const fetchData = await this.fetchSheetsInArray(linkSheetValue);
+				// NOTE: filter the data so that failures are not stored
+				const dataToStore = fetchData.filter((praktikum: PraktikumADT) => {
+					return matchI(praktikum)({
+						failure: () => false,
+						success: () => true,
+					});
+				});
+				this.dataStore.store(dataToStore);
+				return linkSheetSuccess(fetchData);
 			},
 		});
 	}
 
-	// the name and gid is never used, so it is left empty
 	private fetchLinkSheet(linkSheetID: string): Promise<PraktikumADT> {
+		// NOTE: The name and gid is never used, so it is left empty
 		return this.sheetsAPI.fetchSheetPraktikum('', linkSheetID, '', 1);
 	}
 
 	// TODO: this may fail
-	private fetchSheetsInArray(praktikumList: object[]): Promise<PraktikumADT[]> {
+	private fetchSheetsInArray(
+		praktikumList: Praktikum
+	): Promise<PraktikumADT[]> {
+		const listData = praktikumList.data;
 		return Promise.all<PraktikumADT>(
-			praktikumList.map((sheet: object) => {
+			listData.map((sheet: object) => {
 				return this.sheetsAPI.fetchSheetPraktikum(
 					sheet['gsx$namapraktikum']['$t'],
 					sheet['gsx$sheetid']['$t'],

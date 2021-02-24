@@ -44,34 +44,32 @@ export function praktikumFailure(name: string, error: Error): PraktikumADT {
 	};
 }
 
-export type PraktikumListADT = ADT<{
+export type LinkSheetADT = ADT<{
 	failure: { value: Error };
 	success: { value: PraktikumADT[] };
 }>;
 
-export function praktikumListFailure(error: Error): PraktikumListADT {
+export function linkSheetFailure(error: Error): LinkSheetADT {
 	return {
 		_type: 'failure',
 		value: error,
 	};
 }
 
-export function praktikumListSuccess(
-	praktikumList: PraktikumADT[]
-): PraktikumListADT {
+export function linkSheetSuccess(praktikumList: PraktikumADT[]): LinkSheetADT {
 	return {
 		_type: 'success',
 		value: praktikumList,
 	};
 }
 
-export type CachePraktikum = ADT<{
+export type CacheADT = ADT<{
 	empty: {};
 	failure: { value: Error };
 	success: { value: { praktikumList: PraktikumADT[]; time: number } };
 }>;
 
-export function cacheFailure(error: Error): CachePraktikum {
+export function cacheFailure(error: Error): CacheADT {
 	return {
 		_type: 'failure',
 		value: error,
@@ -81,14 +79,14 @@ export function cacheFailure(error: Error): CachePraktikum {
 export function cacheSuccess(
 	praktikumList: PraktikumADT[],
 	time: number
-): CachePraktikum {
+): CacheADT {
 	return {
 		_type: 'success',
 		value: { praktikumList, time },
 	};
 }
 
-export function cacheEmpty(): CachePraktikum {
+export function cacheEmpty(): CacheADT {
 	return {
 		_type: 'empty',
 	};
