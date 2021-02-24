@@ -1,11 +1,16 @@
 import { DataStore } from './data_store';
 import { SheetsAPI } from './sheets_api';
 
-import { getColumn, getURL, parseSheetIndex } from '../utils';
 import {
+	convertColumnToLetter,
+	getColumn,
+	getURL,
+	parseSheetIndex,
+} from '../utils';
+import {
+	PraktikumADT,
 	Praktikum,
-	PraktikumSuccess,
-	PraktikumList,
+	PraktikumListADT,
 	praktikumListFailure,
 	praktikumListSuccess,
 } from '../classes/praktikum';
@@ -18,10 +23,10 @@ export class Repository {
 	// TODO: this may also fail
 	searchPraktikan(
 		inputNPM: string,
-		praktikumList: PraktikumSuccess[],
+		praktikumList: Praktikum[],
 		modul: string
 	): Result[] {
-		let results: Result[];
+		let results: Result[] = [];
 		praktikumList.forEach((praktikum) => {
 			const data = praktikum.data;
 			const index = data.findIndex(
@@ -34,7 +39,9 @@ export class Repository {
 					url: getURL(
 						praktikum.sheetID,
 						praktikum.gid,
-						getColumn(data[index]['content']['$t'], modul),
+						convertColumnToLetter(
+							getColumn(data[index]['content']['$t'], modul) + 1
+						),
 						index + 2
 					),
 				});
@@ -43,7 +50,7 @@ export class Repository {
 		return results;
 	}
 
-	async getPraktikumData(linkSheetID: string): Promise<PraktikumList> {
+	async getPraktikumData(linkSheetID: string): Promise<PraktikumListADT> {
 		const cachedData = await this.dataStore.fetch();
 		return matchPI(cachedData)(
 			{
@@ -53,13 +60,14 @@ export class Repository {
 					}
 					return praktikumListSuccess(value.praktikumList);
 				},
-			}, () => {
-				return this.fetchAndStoreSheets(linkSheetID)
+			},
+			() => {
+				return this.fetchAndStoreSheets(linkSheetID);
 			}
 		);
 	}
 
-	async fetchAndStoreSheets(linkSheetID: string): Promise<PraktikumList> {
+	async fetchAndStoreSheets(linkSheetID: string): Promise<PraktikumListADT> {
 		const masterSheetData = await this.fetchLinkSheet(linkSheetID);
 
 		// If link sheet failed, then return the failure
@@ -77,20 +85,13 @@ export class Repository {
 	}
 
 	// the name and gid is never used, so it is left empty
-	private fetchLinkSheet(linkSheetID: string): Promise<Praktikum> {
-		return this.sheetsAPI.fetchSheetPraktikum(
-			'',
-			linkSheetID,
-			'',
-			1
-		);
+	private fetchLinkSheet(linkSheetID: string): Promise<PraktikumADT> {
+		return this.sheetsAPI.fetchSheetPraktikum('', linkSheetID, '', 1);
 	}
 
 	// TODO: this may fail
-	private fetchSheetsInArray(
-		praktikumList: object[]
-	): Promise<Praktikum[]> {
-		return Promise.all<Praktikum>(
+	private fetchSheetsInArray(praktikumList: object[]): Promise<PraktikumADT[]> {
+		return Promise.all<PraktikumADT>(
 			praktikumList.map((sheet: object) => {
 				return this.sheetsAPI.fetchSheetPraktikum(
 					sheet['gsx$namapraktikum']['$t'],

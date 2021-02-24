@@ -17672,7 +17672,7 @@ class Repository {
     }
     // TODO: this may also fail
     searchPraktikan(inputNPM, praktikumList, modul) {
-        let results;
+        let results = [];
         praktikumList.forEach((praktikum) => {
             const data = praktikum.data;
             const index = data.findIndex((praktikan) => praktikan['gsx$npm']['$t'] === inputNPM);
@@ -17680,7 +17680,7 @@ class Repository {
                 results.push({
                     name: data[index]['gsx$nama']['$t'],
                     prak_name: praktikum.name,
-                    url: (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getURL)(praktikum.sheetID, praktikum.gid, (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getColumn)(data[index]['content']['$t'], modul), index + 2),
+                    url: (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getURL)(praktikum.sheetID, praktikum.gid, (0,_utils__WEBPACK_IMPORTED_MODULE_0__.convertColumnToLetter)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.getColumn)(data[index]['content']['$t'], modul) + 1), index + 2),
                 });
             }
         });
@@ -17712,8 +17712,14 @@ class Repository {
                 },
                 success: ({ value }) => __awaiter(this, void 0, void 0, function* () {
                     const fetchData = yield this.fetchSheetsInArray(value.data);
-                    this.dataStore.store(fetchData);
-                    return (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_1__.praktikumListSuccess)(fetchData);
+                    return (0,ts_adt__WEBPACK_IMPORTED_MODULE_2__.matchPI)(fetchData)({
+                        success: () => {
+                            this.dataStore.store(fetchData);
+                            return (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_1__.praktikumListSuccess)(fetchData);
+                        },
+                    }, () => {
+                        return (0,_classes_praktikum__WEBPACK_IMPORTED_MODULE_1__.praktikumListSuccess)(fetchData);
+                    });
                 }),
             });
         });
@@ -17833,15 +17839,20 @@ document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, vo
     yield refresh();
     _ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading(_ui__WEBPACK_IMPORTED_MODULE_3__.State.IDLE);
 }));
+// TODO: result is always not found
+// TODO: undefined results after cache
+// TODO: choose praktikum
 searchButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
     const NPMField = document.getElementById('npm_text_field').value;
-    const modul = document.getElementById('praktikum_dropdown').value;
+    const modul = document.getElementById('modul_dropdown')
+        .value;
+    _ui__WEBPACK_IMPORTED_MODULE_3__.clearResults();
     const results = repository.searchPraktikan(NPMField, praktikumList, modul);
     if ((0,lodash__WEBPACK_IMPORTED_MODULE_4__.isEmpty)(results)) {
-        results.forEach((result) => _ui__WEBPACK_IMPORTED_MODULE_3__.createResultBox(result));
+        _ui__WEBPACK_IMPORTED_MODULE_3__.showError('NPM was not found!');
     }
     else {
-        _ui__WEBPACK_IMPORTED_MODULE_3__.showError('NPM was not found!');
+        results.forEach((result) => _ui__WEBPACK_IMPORTED_MODULE_3__.createResultBox(result));
     }
 }));
 refreshButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -17851,9 +17862,9 @@ refreshButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, 
 }));
 function refresh() {
     return __awaiter(this, void 0, void 0, function* () {
-        _ui__WEBPACK_IMPORTED_MODULE_3__.clearResults();
         praktikumList = [];
         const masterSheetResult = yield repository.getPraktikumData(linkSheetID);
+        _ui__WEBPACK_IMPORTED_MODULE_3__.clearResults();
         (0,ts_adt__WEBPACK_IMPORTED_MODULE_5__.matchI)(masterSheetResult)({
             failure: ({ value: linkSheetValue }) => {
                 _ui__WEBPACK_IMPORTED_MODULE_3__.showError(`Could not access Link Sheet ${linkSheetValue.message}`);

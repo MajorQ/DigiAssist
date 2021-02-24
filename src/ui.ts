@@ -1,5 +1,5 @@
 import { browser } from 'webextension-polyfill-ts';
-import { PraktikumSuccess } from './classes/praktikum';
+import { Praktikum } from './classes/praktikum';
 import { Result } from './classes/result';
 
 const result = document.getElementById('result');
@@ -56,7 +56,7 @@ export function clearResults() {
 	while(result.firstChild) result.removeChild(result.firstChild);
 }
 
-export function createPraktikumDropdown(list: PraktikumSuccess[]) {
+export function createPraktikumDropdown(list: Praktikum[]) {
 
 	// sort list of praktikum then
 	list.sort((a, b) => {

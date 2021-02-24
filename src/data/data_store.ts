@@ -2,7 +2,7 @@ import { isEmpty } from 'lodash';
 import { browser } from 'webextension-polyfill-ts';
 import { CacheError } from '../classes/errors';
 import {
-	Praktikum,
+	PraktikumADT,
 	CachePraktikum,
 	cacheFailure,
 	cacheSuccess,
@@ -11,7 +11,7 @@ import {
 
 export interface DataStore {
 	fetch(): Promise<CachePraktikum>;
-	store(data: Praktikum[]): void;
+	store(data: PraktikumADT[]): void;
 }
 
 //TODO: for some reason using 2 keys at once doesn't work
@@ -24,7 +24,7 @@ export class BrowserDataStore implements DataStore {
 				(
 					values: [
 						{
-							cache: Praktikum[];
+							cache: PraktikumADT[];
 						},
 						{
 							time: number;
@@ -40,7 +40,7 @@ export class BrowserDataStore implements DataStore {
 			.catch(() => cacheFailure(new CacheError()));
 	}
 
-	async store(data: Praktikum[]) {
+	async store(data: PraktikumADT[]) {
 		return browser.storage.local.set({
 			cache: data,
 			time: Date.now(),

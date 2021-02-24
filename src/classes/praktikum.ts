@@ -1,6 +1,6 @@
 import { ADT } from 'ts-adt';
 
-export interface PraktikumSuccess {
+export interface Praktikum {
 	name: string;
 	sheetID: string;
 	gid: string;
@@ -12,9 +12,9 @@ export interface PraktikumFailure {
 	error: Error;
 }
 
-export type Praktikum = ADT<{
+export type PraktikumADT = ADT<{
 	failure: { value: PraktikumFailure };
-	success: { value: PraktikumSuccess };
+	success: { value: Praktikum };
 }>;
 
 export function praktikumSuccess(
@@ -22,7 +22,7 @@ export function praktikumSuccess(
 	sheetID: string,
 	gid: string,
 	data: object[]
-): Praktikum {
+): PraktikumADT {
 	return {
 		_type: 'success',
 		value: {
@@ -34,7 +34,7 @@ export function praktikumSuccess(
 	};
 }
 
-export function praktikumFailure(name: string, error: Error): Praktikum {
+export function praktikumFailure(name: string, error: Error): PraktikumADT {
 	return {
 		_type: 'failure',
 		value: {
@@ -44,12 +44,12 @@ export function praktikumFailure(name: string, error: Error): Praktikum {
 	};
 }
 
-export type PraktikumList = ADT<{
+export type PraktikumListADT = ADT<{
 	failure: { value: Error };
-	success: { value: Praktikum[] };
+	success: { value: PraktikumADT[] };
 }>;
 
-export function praktikumListFailure(error: Error): PraktikumList {
+export function praktikumListFailure(error: Error): PraktikumListADT {
 	return {
 		_type: 'failure',
 		value: error,
@@ -57,8 +57,8 @@ export function praktikumListFailure(error: Error): PraktikumList {
 }
 
 export function praktikumListSuccess(
-	praktikumList: Praktikum[]
-): PraktikumList {
+	praktikumList: PraktikumADT[]
+): PraktikumListADT {
 	return {
 		_type: 'success',
 		value: praktikumList,
@@ -68,7 +68,7 @@ export function praktikumListSuccess(
 export type CachePraktikum = ADT<{
 	empty: {};
 	failure: { value: Error };
-	success: { value: { praktikumList: Praktikum[]; time: number } };
+	success: { value: { praktikumList: PraktikumADT[]; time: number } };
 }>;
 
 export function cacheFailure(error: Error): CachePraktikum {
@@ -79,12 +79,12 @@ export function cacheFailure(error: Error): CachePraktikum {
 }
 
 export function cacheSuccess(
-	praktikumList: Praktikum[],
+	praktikumList: PraktikumADT[],
 	time: number
 ): CachePraktikum {
 	return {
 		_type: 'success',
-		value: {praktikumList, time},
+		value: { praktikumList, time },
 	};
 }
 

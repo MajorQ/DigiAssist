@@ -22,7 +22,7 @@ export function getColumn(content: string, modul: string): number {
 export function getURL(
 	sheetID: string,
 	gid: string,
-	column: number,
+	column: string,
 	row: number
 ): string {
 	return `https://docs.google.com/spreadsheets/d/${sheetID}/edit#gid=${gid}&range=${column}${row}`;

@@ -2,7 +2,7 @@ import { BrowserDataStore } from './data/data_store';
 import { Repository } from './data/repository';
 import { FetchSheetsAPI } from './data/sheets_api';
 import * as UI from './ui';
-import { PraktikumSuccess } from './classes/praktikum';
+import { Praktikum } from './classes/praktikum';
 import { isEmpty } from 'lodash';
 import { matchI } from 'ts-adt';
 
@@ -12,7 +12,7 @@ const refreshButton = document.getElementById('refresh_button');
 const linkSheetID = '1INKbXKbih8q-JwNm74zjVThU7f75EpA4Pwh1niX6iQw';
 const repository = new Repository(new BrowserDataStore(), new FetchSheetsAPI());
 
-let praktikumList: PraktikumSuccess[] = [];
+let praktikumList: Praktikum[];
 
 document.addEventListener('DOMContentLoaded', async () => {
 	UI.toggleLoading(UI.State.BUSY);
@@ -20,19 +20,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 	UI.toggleLoading(UI.State.IDLE);
 });
 
+// TODO: result is always not found
+// TODO: undefined results after cache
+// TODO: choose praktikum
+
 searchButton.addEventListener('click', async () => {
 	const NPMField = (document.getElementById(
 		'npm_text_field'
 	) as HTMLInputElement).value;
-	const modul = (document.getElementById(
-		'praktikum_dropdown'
-	) as HTMLInputElement).value;
+	const modul = (document.getElementById('modul_dropdown') as HTMLInputElement)
+		.value;
+ 
+	UI.clearResults();
 
 	const results = repository.searchPraktikan(NPMField, praktikumList, modul);
 	if (isEmpty(results)) {
-		results.forEach((result) => UI.createResultBox(result));
-	} else {
 		UI.showError('NPM was not found!');
+	} else {
+		results.forEach((result) => UI.createResultBox(result));
 	}
 });
 
@@ -43,12 +48,11 @@ refreshButton.addEventListener('click', async () => {
 });
 
 async function refresh() {
-	UI.clearResults();
-
+	
 	praktikumList = [];
-
+	UI.clearResults();
+	
 	const masterSheetResult = await repository.getPraktikumData(linkSheetID);
-
 	matchI(masterSheetResult)({
 		failure: ({ value: linkSheetValue }) => {
 			UI.showError(`Could not access Link Sheet ${linkSheetValue.message}`);

@@ -5,7 +5,7 @@ import {
 	ResponseParseError,
 } from '../classes/errors';
 import {
-	Praktikum,
+	PraktikumADT,
 	praktikumFailure,
 	praktikumSuccess,
 } from '../classes/praktikum';
@@ -17,7 +17,7 @@ export interface SheetsAPI {
 		sheetID: string,
 		gid: string,
 		sheetIndex: number
-	): Promise<Praktikum>;
+	): Promise<PraktikumADT>;
 }
 
 export class FetchSheetsAPI implements SheetsAPI {
@@ -50,7 +50,7 @@ export class FetchSheetsAPI implements SheetsAPI {
 		sheetID: string,
 		gid: string,
 		sheetIndex: number
-	): Promise<Praktikum> {
+	): Promise<PraktikumADT> {
 		return this.fetchSheet(sheetID, sheetIndex)
 			.then((data) => praktikumSuccess(name, sheetID, gid, data))
 			.catch((error: Error) => praktikumFailure(name, error));
