@@ -16,15 +16,18 @@ export function searchPraktikan(
 			(praktikan) => praktikan['gsx$npm']['$t'] === inputNPM
 		);
 		if (index !== -1) {
+			console.log(getColumn(data[index]['content']['$t'], modul));
+			
 			results.push({
 				name: data[index]['gsx$nama']['$t'],
 				prak_name: praktikum.name,
 				url: getURL(
 					praktikum.sheetID,
 					praktikum.gid,
-					convertColumnToLetter(
-						getColumn(data[index]['content']['$t'], modul) + 1
-					),
+					'B',
+					// convertColumnToLetter(
+					// 	getColumn(data[0]['content']['$t'], modul) + 1
+					// ),
 					index + 2
 				),
 			});

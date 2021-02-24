@@ -53,10 +53,12 @@ export function createResultBox(res: Result) {
 }
 
 export function clearResults() {
-	while(result.firstChild) result.removeChild(result.firstChild);
+	while (result.childElementCount > 0) result.removeChild(result.lastChild);
 }
 
 export function createPraktikumDropdown(list: Praktikum[]) {
+	while (praktikum_dropdown.childElementCount > 1)
+		praktikum_dropdown.removeChild(praktikum_dropdown.lastChild);
 
 	// sort list of praktikum then
 	list.sort((a, b) => {

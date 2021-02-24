@@ -17809,10 +17809,15 @@ function searchPraktikan(inputNPM, praktikumList, modul) {
         const data = praktikum.data;
         const index = data.findIndex((praktikan) => praktikan['gsx$npm']['$t'] === inputNPM);
         if (index !== -1) {
+            console.log((0,_utils__WEBPACK_IMPORTED_MODULE_0__.getColumn)(data[index]['content']['$t'], modul));
             results.push({
                 name: data[index]['gsx$nama']['$t'],
                 prak_name: praktikum.name,
-                url: (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getURL)(praktikum.sheetID, praktikum.gid, (0,_utils__WEBPACK_IMPORTED_MODULE_0__.convertColumnToLetter)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.getColumn)(data[index]['content']['$t'], modul) + 1), index + 2),
+                url: (0,_utils__WEBPACK_IMPORTED_MODULE_0__.getURL)(praktikum.sheetID, praktikum.gid, 'B', 
+                // convertColumnToLetter(
+                // 	getColumn(data[0]['content']['$t'], modul) + 1
+                // ),
+                index + 2),
             });
         }
     });
@@ -17979,10 +17984,12 @@ function createResultBox(res) {
     result.appendChild(box);
 }
 function clearResults() {
-    while (result.firstChild)
-        result.removeChild(result.firstChild);
+    while (result.childElementCount > 0)
+        result.removeChild(result.lastChild);
 }
 function createPraktikumDropdown(list) {
+    while (praktikum_dropdown.childElementCount > 1)
+        praktikum_dropdown.removeChild(praktikum_dropdown.lastChild);
     // sort list of praktikum then
     list.sort((a, b) => {
         if (a.name < b.name) {
