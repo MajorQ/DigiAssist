@@ -17802,6 +17802,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/utils.ts");
 
 // TODO: this may fail
+// TODO: choose modul
 function searchPraktikan(inputNPM, praktikumList, modul) {
     let results = [];
     praktikumList.forEach((praktikum) => {
@@ -17860,19 +17861,20 @@ const repository = new _data_repository__WEBPACK_IMPORTED_MODULE_1__.Repository(
 let praktikumList;
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     _ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading(_ui__WEBPACK_IMPORTED_MODULE_3__.State.BUSY);
-    _ui__WEBPACK_IMPORTED_MODULE_3__.clearResults();
     const praktikumData = yield repository.getPraktikumData(linkSheetID);
-    // console.log(praktikumData);
     yield refresh(praktikumData);
     _ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading(_ui__WEBPACK_IMPORTED_MODULE_3__.State.IDLE);
 }));
-// TODO: choose praktikum
 searchButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
     const NPMField = document.getElementById('npm_text_field').value;
     const modul = document.getElementById('modul_dropdown')
         .value;
+    const praktikum = document.getElementById('praktikum_dropdown').value;
+    const searchList = praktikum === ''
+        ? praktikumList
+        : praktikumList.filter((item) => item.name === praktikum);
     _ui__WEBPACK_IMPORTED_MODULE_3__.clearResults();
-    const results = (0,_domain_search_use_case__WEBPACK_IMPORTED_MODULE_6__.searchPraktikan)(NPMField, praktikumList, modul);
+    const results = (0,_domain_search_use_case__WEBPACK_IMPORTED_MODULE_6__.searchPraktikan)(NPMField, searchList, modul);
     if ((0,lodash__WEBPACK_IMPORTED_MODULE_4__.isEmpty)(results)) {
         _ui__WEBPACK_IMPORTED_MODULE_3__.showError('NPM was not found!');
     }
@@ -17882,6 +17884,7 @@ searchButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, f
 }));
 refreshButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
     _ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading(_ui__WEBPACK_IMPORTED_MODULE_3__.State.BUSY);
+    _ui__WEBPACK_IMPORTED_MODULE_3__.clearResults();
     const praktikumData = yield repository.fetchPraktikumData(linkSheetID);
     yield refresh(praktikumData);
     _ui__WEBPACK_IMPORTED_MODULE_3__.toggleLoading(_ui__WEBPACK_IMPORTED_MODULE_3__.State.IDLE);

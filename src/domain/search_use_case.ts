@@ -3,6 +3,7 @@ import { Result } from '../classes/result';
 import { convertColumnToLetter, getColumn, getURL } from '../utils';
 
 // TODO: this may fail
+// TODO: choose modul
 export function searchPraktikan(
 	inputNPM: string,
 	praktikumList: Praktikum[],

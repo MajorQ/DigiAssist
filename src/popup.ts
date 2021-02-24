@@ -2,7 +2,7 @@ import { BrowserDataStore } from './data/data_store';
 import { Repository } from './data/repository';
 import { FetchSheetsAPI } from './data/sheets_api';
 import * as UI from './ui';
-import { LinkSheetADT, Praktikum, PraktikumADT } from './classes/praktikum';
+import { LinkSheetADT, Praktikum } from './classes/praktikum';
 import { isEmpty } from 'lodash';
 import { matchI } from 'ts-adt';
 import { searchPraktikan } from './domain/search_use_case';
@@ -17,15 +17,10 @@ let praktikumList: Praktikum[];
 
 document.addEventListener('DOMContentLoaded', async () => {
 	UI.toggleLoading(UI.State.BUSY);
-	UI.clearResults();
 	const praktikumData = await repository.getPraktikumData(linkSheetID);
-	// console.log(praktikumData);
-	
 	await refresh(praktikumData);
 	UI.toggleLoading(UI.State.IDLE);
 });
-
-// TODO: choose praktikum
 
 searchButton.addEventListener('click', async () => {
 	const NPMField = (document.getElementById(
@@ -33,10 +28,17 @@ searchButton.addEventListener('click', async () => {
 	) as HTMLInputElement).value;
 	const modul = (document.getElementById('modul_dropdown') as HTMLInputElement)
 		.value;
+	const praktikum = (document.getElementById(
+		'praktikum_dropdown'
+	) as HTMLInputElement).value;
+
+	const searchList =
+		praktikum === ''
+			? praktikumList
+			: praktikumList.filter((item) => item.name === praktikum);
 
 	UI.clearResults();
-
-	const results = searchPraktikan(NPMField, praktikumList, modul);
+	const results = searchPraktikan(NPMField, searchList, modul);
 	if (isEmpty(results)) {
 		UI.showError('NPM was not found!');
 	} else {
@@ -46,6 +48,7 @@ searchButton.addEventListener('click', async () => {
 
 refreshButton.addEventListener('click', async () => {
 	UI.toggleLoading(UI.State.BUSY);
+	UI.clearResults();
 	const praktikumData = await repository.fetchPraktikumData(linkSheetID);
 	await refresh(praktikumData);
 	UI.toggleLoading(UI.State.IDLE);
