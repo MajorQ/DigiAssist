@@ -21,7 +21,7 @@
 5. Enjoy!
 
 ## Screenshots
-![Example screenshot](./screenshots/popup.png)
+![Example screenshot](screenshots/popup.png)
 
 ## Changing link sheet URL
 You would need to change this URL every semester to get a new batch of practicum.
