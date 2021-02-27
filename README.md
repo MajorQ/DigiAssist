@@ -14,7 +14,7 @@
   - [Contact](#contact)
 
 ## Installation
-1. Download DigiAssist latest release from this repository
+1. Download DigiAssist and extract the latest release from this repository
 2. Go to `chrome://extensions/`
 3. Choose `Load unpacked`
 4. Select the `dist/` folder from the download
