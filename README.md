@@ -10,7 +10,6 @@
   - [Features](#features)
   - [Status](#status)
   - [Known bugs](#known-bugs)
-  - [Technologies](#technologies)
   - [Contact](#contact)
 
 ## Installation
