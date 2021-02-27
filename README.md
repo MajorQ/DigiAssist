@@ -13,10 +13,18 @@
   - [Contact](#contact)
 
 ## Installation
+### Google Chrome/Microsoft Edge
 1. Download DigiAssist and extract the latest release from this repository
 2. Go to `chrome://extensions/`
 3. Choose `Load unpacked`
 4. Select the `dist/` folder from the download
+5. Enjoy!
+
+### Mozilla Firefox
+1. Download DigiAssist and extract the latest release from this repository
+2. Go to `about:debugging#/runtime/this-firefox`
+3. Choose `Load Temporary Add-on...`
+4. Select the `dist/manifest.json` file from the download
 5. Enjoy!
 
 ## Screenshots
