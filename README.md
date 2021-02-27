@@ -46,9 +46,5 @@ Project is: _ongoing_.
 ## Known bugs
 None as of yet.
 
-## Technologies
-* Javascript + HTML - version 1.0.0
-* Typescript + HTML - version 2.0.0
-
 ## Contact
 Created by Salman - feel free to contact via email at mohammadalfarisi00@gmail.com!
